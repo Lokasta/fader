@@ -22,7 +22,14 @@ enum Snapshot {
             host.layoutSubtreeIfNeeded()
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { exit(1) }
+                // Rendered at 3x so README and social images stay sharp on Retina screens.
+                let scale = 3
+                guard let rep = NSBitmapImageRep(
+                    bitmapDataPlanes: nil, pixelsWide: Int(host.bounds.width) * scale, pixelsHigh: Int(host.bounds.height) * scale,
+                    bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                    colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
+                ) else { exit(1) }
+                rep.size = host.bounds.size
                 host.cacheDisplay(in: host.bounds, to: rep)
                 try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
                 exit(0)

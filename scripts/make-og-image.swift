@@ -6,7 +6,8 @@ import AppKit
 
 let width = 1200, height = 630
 let iconURL = URL(fileURLWithPath: "Fader/Assets.xcassets/AppIcon.appiconset/icon_512x512.png")
-let panelURL = URL(fileURLWithPath: "docs/panel.png")
+// The social card uses a render of the site's interactive panel (clean demo apps, 3x).
+let panelURL = URL(fileURLWithPath: "site/assets/demo-panel.png")
 let output = URL(fileURLWithPath: "site/assets/og.png")
 
 guard let icon = NSImage(contentsOf: iconURL), let panel = NSImage(contentsOf: panelURL) else {
