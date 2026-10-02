@@ -40,4 +40,12 @@ codesign --sign "Developer ID Application" --timestamp "$DMG"
 xcrun notarytool submit "$DMG" --keychain-profile "$PROFILE" --wait
 xcrun stapler staple "$DMG"
 spctl --assess --type open --context context:primary-signature -v "$DMG"
-echo "Ready: $DMG"
+
+# A stable name too, so ".../releases/latest/download/LokastasFader.dmg" always points at the newest build.
+cp "$DMG" dist/LokastasFader.dmg
+echo "Ready: $DMG (+ dist/LokastasFader.dmg)"
+
+if [[ "${PUBLISH:-0}" == 1 ]]; then
+    NOTES=$(awk -v v="$VERSION" '$0 ~ "^## .* -- "v"$" {f=1; next} /^## / && f {exit} f' CHANGELOG.md)
+    gh release create "v$VERSION" "$DMG" dist/LokastasFader.dmg --title "Lokasta's Fader $VERSION" --notes "$NOTES"
+fi

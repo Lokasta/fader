@@ -11,7 +11,7 @@ Audio is processed in memory, in real time, and then discarded. Nothing is recor
 
 ## Other system changes
 
-- **Dictation key remap.** By default the Dictation key (F5) is mapped to F18 with `hidutil` so it can open the panel. Turn it off in the gear menu; the mapping is removed immediately and is also cleared on reboot.
+- **Dictation key remap.** By default the Dictation key (F5) is mapped to F18 with `hidutil` so it can open the panel. Turn it off in the gear menu; the mapping is removed immediately, whenever Fader quits, and on reboot.
 - **Launch at login** is enabled on first run from /Applications through `SMAppService`; turn it off in the gear menu or in System Settings > General > Login Items.
 - When Fader quits or crashes, macOS destroys its taps and every app's audio returns to normal immediately.
 

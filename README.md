@@ -33,7 +33,22 @@ Fader uses the **Core Audio Process Taps** Apple added in macOS 14.2. It only to
 
 ## Install
 
-**Download:** grab the latest `.dmg` from [Releases](../../releases), open it and drag Fader to Applications. It's signed and notarized.
+<p align="center">
+  <a href="https://github.com/Lokasta/fader/releases/latest/download/LokastasFader.dmg"><b>⬇ Download Lokasta's Fader for macOS</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://lokasta.github.io/fader/">Website</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Lokasta/fader/releases">All releases</a>
+</p>
+
+1. Download **LokastasFader.dmg** (link above, always the latest version). Requires macOS 15 or later.
+2. Open it and drag **Fader** into **Applications**.
+3. Open Fader from Applications or Spotlight. It lives in the menu bar (no Dock icon) and starts at login.
+4. Allow **System Audio Recording** when macOS asks (System Settings > Privacy & Security > Screen & System Audio Recording, if you missed the prompt).
+
+The app is signed with a Developer ID and notarized by Apple, so it opens without warnings. Updating: download the new DMG and replace the app; your volumes and settings are kept.
+
+**Uninstall:** quit Fader (gear > Quit), drag it from Applications to the Trash. Optionally remove its settings with `defaults delete com.lokasta.fader`.
 
 **Build from source** (Xcode 26+):
 

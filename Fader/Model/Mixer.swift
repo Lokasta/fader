@@ -369,6 +369,8 @@ final class Mixer: ObservableObject {
     }
 
     private func tearDown() {
+        // With Fader gone nothing listens for F18, so give the Dictation key back.
+        if dictationKeyOpensPanel { DictationKeyRemap.apply(false) }
         timer?.invalidate()
         meterTimer?.invalidate()
         micMeter.stop()
