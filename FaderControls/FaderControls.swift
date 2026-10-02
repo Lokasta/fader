@@ -19,6 +19,6 @@ struct OpenFaderControl: ControlWidget {
             }
         }
         .displayName("Fader")
-        .description("Volume de cada app, saída e microfone.")
+        .description("Per-app volume, output and microphone.")
     }
 }

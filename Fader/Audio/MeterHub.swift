@@ -60,7 +60,7 @@ final class MeterHub {
 
     private func start() throws {
         guard let outputUID = AudioDevices.uid(of: outputDevice) else {
-            throw CoreAudioError(status: kAudioHardwareBadDeviceError, context: "saída sem UID")
+            throw CoreAudioError(status: kAudioHardwareBadDeviceError, context: "output device has no UID")
         }
 
         var tapList: [[String: Any]] = []
@@ -71,7 +71,7 @@ final class MeterHub {
             description.muteBehavior = .unmuted
             description.isPrivate = true
             var tapID = AudioObjectID.unknown
-            try check(AudioHardwareCreateProcessTap(description, &tapID), "criar tap de medidor")
+            try check(AudioHardwareCreateProcessTap(description, &tapID), "create meter tap")
             taps.append(tapID)
             tapList.append([kAudioSubTapUIDKey: description.uuid.uuidString, kAudioSubTapDriftCompensationKey: true])
             let box = PeakBox()
@@ -80,7 +80,7 @@ final class MeterHub {
         }
 
         let aggregate: [String: Any] = [
-            kAudioAggregateDeviceNameKey: "Fader (medidores)",
+            kAudioAggregateDeviceNameKey: "Fader (meters)",
             kAudioAggregateDeviceUIDKey: AudioDevices.ownAggregatePrefix + UUID().uuidString,
             kAudioAggregateDeviceMainSubDeviceKey: outputUID,
             kAudioAggregateDeviceIsPrivateKey: true,
@@ -89,13 +89,13 @@ final class MeterHub {
             kAudioAggregateDeviceSubDeviceListKey: [[kAudioSubDeviceUIDKey: outputUID]],
             kAudioAggregateDeviceTapListKey: tapList,
         ]
-        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &aggregateID), "criar agregado de medidores")
+        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &aggregateID), "create meter aggregate")
 
         // Input streams are the output device's own inputs first, then one per tap, in tap-list order.
         let deviceInputs = AudioDevices.streamCount(of: outputDevice, scope: kAudioObjectPropertyScopeInput)
         let totalInputs = AudioDevices.streamCount(of: aggregateID, scope: kAudioObjectPropertyScopeInput)
         guard totalInputs == deviceInputs + boxes.count else {
-            throw CoreAudioError(status: kAudioHardwareUnspecifiedError, context: "layout inesperado: \(totalInputs) streams para \(boxes.count) taps")
+            throw CoreAudioError(status: kAudioHardwareUnspecifiedError, context: "unexpected layout: \(totalInputs) streams for \(boxes.count) taps")
         }
 
         try check(AudioDeviceCreateIOProcIDWithBlock(&ioProcID, aggregateID, nil) { _, input, _, output, _ in
@@ -106,7 +106,7 @@ final class MeterHub {
             for buffer in UnsafeMutableAudioBufferListPointer(output) {
                 if let data = buffer.mData { memset(data, 0, Int(buffer.mDataByteSize)) }
             }
-        }, "criar IO proc de medidores")
+        }, "create meter IO proc")
 
         if let ioProcID {
             // Read only the taps: never the device's own inputs (a headset mic) and write no output.
@@ -116,7 +116,7 @@ final class MeterHub {
             setStreamUsage(device: aggregateID, procID: ioProcID, scope: kAudioObjectPropertyScopeOutput,
                            enabled: Array(repeating: false, count: outputs))
         }
-        try check(AudioDeviceStart(aggregateID, ioProcID), "iniciar medidores")
+        try check(AudioDeviceStart(aggregateID, ioProcID), "start meters")
         log.info("metering \(boxes.count) apps through one aggregate")
     }
 }

@@ -1,70 +1,88 @@
-# Fader
+<p align="center">
+  <img src="Fader/Assets.xcassets/AppIcon.appiconset/icon_256x256.png" width="128" alt="Lokasta's Fader icon">
+</p>
 
-Volume por app no macOS, direto da barra de menu. Sem driver, sem BlackHole, sem dispositivo virtual.
+<h1 align="center">Lokasta's Fader</h1>
 
-![Painel do Fader](docs/panel.png)
+<p align="center">
+  Per-app volume for macOS, from the menu bar or Control Center.<br>
+  No drivers, no BlackHole, no virtual devices. Free and open source.
+</p>
 
-## O que faz
+<p align="center">
+  <img src="docs/panel.png" width="340" alt="Fader panel: output and microphone at the top, one slider per app below">
+</p>
 
-- **Volume de cada app** de 0 a 200%: baixa o Discord sem baixar o jogo, dá um boost num vídeo baixinho. Acima de 100% um limitador suave evita estourar.
-- **Mudo por app** com um clique no alto-falante.
-- **Medidores ao vivo** embaixo de cada slider (apps, saída e microfone), mostrando o nível que está saindo agora. Só rodam com o painel aberto.
-- **Lembra o volume** de cada app e reaplica sozinho quando ele volta a tocar.
-- **Saída e microfone**: troca o dispositivo padrão e ajusta o volume de cada um (o mesmo que Ajustes > Som faz).
-- Agrupa processos auxiliares no app certo: o áudio do Chrome, do Safari (WebKit) ou de um `afplay` no terminal aparece com o nome e o ícone do app dono.
-- **Controle na Central de Controle** (macOS 26+): um botão "Fader" que abre o painel no canto da tela, igual à Central de Controle. Também pode ir direto pra barra de menu.
-- Abre ao iniciar o Mac (dá pra desligar na engrenagem).
+## Why
 
-## Central de Controle
+macOS has one volume slider for everything. Turning Discord down means turning your game down too. The usual fixes install a virtual audio driver and ask you to rewire your output, and when something goes wrong your sound just stops.
 
-1. Abra a Central de Controle e clique em **Editar Controles**.
-2. Busque **Fader** e arraste o controle pra Central de Controle ou pra barra de menu.
+Fader uses the **Core Audio Process Taps** Apple added in macOS 14.2. It only touches the apps you change, installs nothing in the system, and if it quits, every app's audio goes back to normal instantly.
 
-A Apple só permite **botões e liga/desliga** em controles de terceiros (o slider de Som é exclusivo do sistema), então o controle do Fader abre o painel completo com um clique. Por baixo ele chama `fader://panel`, que também funciona em atalhos, Raycast etc.
+## Features
 
-## Como funciona
+- **Volume per app, 0 to 200%**, with mute. A soft limiter keeps boosted audio from clipping.
+- **Live level meters** for every app, the output and the microphone.
+- **Remembers** each app's volume and reapplies it the next time the app plays.
+- **Output and microphone switcher** with their system volume, right at the top.
+- **Real app names**: Chrome's audio service shows up as Chrome, Safari's WebKit process as Safari, macOS alerts as "System Sounds".
+- **Open it your way**: menu bar icon, a **Control Center control** (macOS 26), the **Dictation key (F5)**, **⌃⌥V** from anywhere, or Spotlight.
+- **Light**: ~0.5% CPU at idle. Meters run only while the panel is open.
+- **Private**: no network access at all. See [SECURITY.md](SECURITY.md).
+- English and Brazilian Portuguese.
 
-Usa os **Core Audio Process Taps** (macOS 14.2+). Para cada app que não está em 100%:
+## Install
 
-1. Um *process tap* captura o áudio dos processos do app e, com `mutedWhenTapped`, impede que ele chegue direto nos alto-falantes.
-2. Um dispositivo agregado privado junta esse tap com a saída atual.
-3. Um IO proc copia as amostras do tap para a saída aplicando o ganho, com rampa por buffer (sem cliques).
+**Download:** grab the latest `.dmg` from [Releases](../../releases), open it and drag Fader to Applications. It's signed and notarized.
 
-Apps em 100% não passam por nada disso: o áudio deles segue o caminho normal do macOS.
-
-### O microfone fica intocado
-
-- O Fader só abre o microfone pra mostrar o medidor, **e só enquanto o painel está aberto**. Fechou o painel, o mic é solto. A bolinha laranja acende só nesse intervalo.
-- Mic Bluetooth nunca é aberto pelo medidor (forçaria o fone pro modo de chamada).
-- Quando a saída é um fone Bluetooth (AirPods), o agregado também expõe o microfone do fone. O Fader desliga esses streams no IO proc (`kAudioDevicePropertyIOProcStreamUsage`), então o fone não cai no modo de chamada.
-- O controle de microfone só muda o dispositivo padrão e o volume de entrada, que são propriedades do sistema.
-- Se o Fader fechar ou travar, o macOS destrói os taps junto com o processo e o som volta ao normal na hora.
-
-## Permissão
-
-Na primeira vez o macOS pede **Gravação de Áudio do Sistema** (Ajustes > Privacidade e Segurança). Sem ela o Fader não cria taps, porque um tap sem permissão silenciaria o app.
-
-## Desenvolvimento
-
-Requer Xcode 26+ e [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
+**Build from source** (Xcode 26+):
 
 ```bash
-./scripts/install.sh          # build Release, instala em /Applications e abre
-xcodegen generate             # gera Fader.xcodeproj a partir do project.yml
-xcodebuild -project Fader.xcodeproj -scheme Fader -derivedDataPath build test
-swift scripts/make-icon.swift # regenera o ícone
-
-# Renderiza o painel num PNG (útil para checar layout sem clicar na barra)
-build/Build/Products/Debug/Fader.app/Contents/MacOS/Fader --snapshot painel.png
-
-# Logs
-/usr/bin/log show --last 5m --predicate 'subsystem == "com.lokasta.fader"' --info
+brew install xcodegen
+git clone https://github.com/Lokasta/fader && cd fader
+./scripts/install.sh
 ```
 
-## Abrindo o painel
+Source builds are ad-hoc signed, so macOS asks for permissions again after each rebuild. To sign with your own certificate, see `Config/Signing.xcconfig`.
 
-- Ícone na barra de menu (ao lado do Som), controle da Central de Controle, tecla **F5** (a de Ditado), atalho **⌃⌥V** de qualquer app, ou abrir o Fader de novo pelo Spotlight.
-- O F5 é remapeado para F18 com `hidutil` (sem driver). Desligue em Engrenagem > "Tecla de Ditado (F5) abre o Fader" para voltar ao Ditado.
-- Barra lotada (notch) esconde ícones sem aviso. Para fixar o Fader perto do relógio:
-  `pkill -x Fader; defaults write com.lokasta.fader "NSStatusItem Preferred Position Item-0" -float 330; open -a Fader`
-  (o número é a distância da borda direita; o Som da Apple fica por volta de 320).
+**Or ask your coding agent.** The repo ships an [AGENTS.md](AGENTS.md) written for Claude Code, Codex, Cursor and friends: clone it and say *"build and install Fader"*, or *"add a keyboard shortcut to mute Spotify"*. It has the architecture, the rules that keep audio safe, and how to verify changes without ears.
+
+## First run
+
+1. macOS asks for **System Audio Recording**: that's how Fader reads each app's audio. Nothing is recorded.
+2. Opening the panel asks for the **Microphone**, only for the mic level meter. Deny it and everything else still works.
+3. To put Fader in Control Center: Control Center > **Edit Controls** > search **Fader** > drag it in (or to the menu bar).
+
+Crowded menu bar? On notched MacBooks, icons that don't fit are hidden silently. Use F5, ⌃⌥V or Spotlight, or pin the icon next to the clock:
+
+```bash
+pkill -x Fader; defaults write com.lokasta.fader "NSStatusItem Preferred Position Item-0" -float 330; open -a Fader
+```
+
+## How it works
+
+For an app you turn down (or up):
+
+1. A **process tap** captures the app's processes and, with `mutedWhenTapped`, keeps them from reaching the speakers directly.
+2. A private **aggregate device** pairs that tap with your current output.
+3. A real-time **IO proc** copies the samples to the output with your gain, ramped per buffer so changes never click.
+
+Apps at 100% skip all of this. While the panel is open, their meters come from unmuted taps that share a single aggregate device, so 20 playing apps cost one audio thread, not twenty.
+
+The microphone is never captured by the volume engine. The mic meter reads it only while the panel is open, and never on Bluetooth microphones, which would switch your headphones to call quality.
+
+## Development
+
+```bash
+xcodegen generate                                                   # project from project.yml
+xcodebuild -project Fader.xcodeproj -scheme Fader -derivedDataPath build test
+build/Build/Products/Debug/Fader.app/Contents/MacOS/Fader --snapshot panel.png   # render the panel
+/usr/bin/log show --last 5m --predicate 'subsystem == "com.lokasta.fader"' --info  # logs
+./scripts/release.sh                                                # signed + notarized DMG
+```
+
+Contributions are welcome. Read [AGENTS.md](AGENTS.md) first (yes, humans too), keep the IO path real-time safe, and add a [CHANGELOG](CHANGELOG.md) entry.
+
+## License
+
+[MIT](LICENSE) © 2026 Lokasta

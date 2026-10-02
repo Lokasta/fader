@@ -1,0 +1,376 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "Accessibility": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acessibilidade"
+          }
+        }
+      }
+    },
+    "Allow": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir"
+          }
+        }
+      }
+    },
+    "Allow Fader in System Settings > Privacy & Security > Screen & System Audio Recording.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libere o Fader em Ajustes > Privacidade e Segurança > Gravação de Tela e Áudio do Sistema."
+          }
+        }
+      }
+    },
+    "Allow microphone access to see the level": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permita o microfone pro Fader pra ver o nível"
+          }
+        }
+      }
+    },
+    "Change the audio output": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trocar a saída de áudio"
+          }
+        }
+      }
+    },
+    "Change the default microphone": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trocar o microfone padrão"
+          }
+        }
+      }
+    },
+    "Couldn't control this app": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não consegui controlar esse app"
+          }
+        }
+      }
+    },
+    "Dictation key (F5) opens Fader": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tecla de Ditado (F5) abre o Fader"
+          }
+        }
+      }
+    },
+    "Double-click to reset": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clique duas vezes para restaurar"
+          }
+        }
+      }
+    },
+    "MICROPHONE": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MICROFONE"
+          }
+        }
+      }
+    },
+    "Meter off for Bluetooth mics (keeps your headset sounding good)": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medidor desligado em mic Bluetooth (pra não derrubar a qualidade do fone)"
+          }
+        }
+      }
+    },
+    "Mute": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenciar"
+          }
+        }
+      }
+    },
+    "Mute everything": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenciar tudo"
+          }
+        }
+      }
+    },
+    "Mute microphone": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenciar microfone"
+          }
+        }
+      }
+    },
+    "No app is playing audio": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum app tocando áudio"
+          }
+        }
+      }
+    },
+    "No microphone": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem microfone"
+          }
+        }
+      }
+    },
+    "No output": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem saída"
+          }
+        }
+      }
+    },
+    "OUTPUT": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SAÍDA"
+          }
+        }
+      }
+    },
+    "One permission missing": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falta uma permissão"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Ajustes"
+          }
+        }
+      }
+    },
+    "Open Sound Settings…": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Ajustes de Som…"
+          }
+        }
+      }
+    },
+    "Open at login": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir ao iniciar o Mac"
+          }
+        }
+      }
+    },
+    "Options": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opções"
+          }
+        }
+      }
+    },
+    "Play something and it shows up here.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dá play em alguma coisa e ela aparece aqui."
+          }
+        }
+      }
+    },
+    "Process %lld": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Processo %lld"
+          }
+        }
+      }
+    },
+    "Quit": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sair"
+          }
+        }
+      }
+    },
+    "Remember each app's volume": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lembrar o volume de cada app"
+          }
+        }
+      }
+    },
+    "Reset volume": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar volume"
+          }
+        }
+      }
+    },
+    "Shortcut: ⌃⌥V": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atalho: ⌃⌥V"
+          }
+        }
+      }
+    },
+    "System Sounds": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sons do sistema"
+          }
+        }
+      }
+    },
+    "System Speech": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fala do sistema"
+          }
+        }
+      }
+    },
+    "This device doesn't let macOS change its volume": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esse dispositivo não deixa o macOS mudar o volume"
+          }
+        }
+      }
+    },
+    "Unmute": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativar som"
+          }
+        }
+      }
+    },
+    "fixed": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "fixo"
+          }
+        }
+      }
+    },
+    "macOS needs to let Fader access app audio. Nothing is recorded.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O macOS precisa deixar o Fader acessar o áudio dos apps. Nada é gravado."
+          }
+        }
+      }
+    },
+    "muted": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mudo"
+          }
+        }
+      }
+    },
+    "paused": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pausado"
+          }
+        }
+      }
+    }
+  }
+}

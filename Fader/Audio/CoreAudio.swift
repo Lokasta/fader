@@ -104,7 +104,7 @@ enum AudioDevices {
     }
 
     static func name(of device: AudioObjectID) -> String {
-        (try? device.readString(kAudioObjectPropertyName)) ?? "Saída \(device)"
+        (try? device.readString(kAudioObjectPropertyName)) ?? "Output \(device)"
     }
 
     static func streamCount(of device: AudioObjectID, scope: AudioObjectPropertyScope) -> Int {

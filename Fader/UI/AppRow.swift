@@ -28,7 +28,7 @@ struct AppRow: View {
                             .foregroundStyle(.yellow)
                             .help(failure)
                     } else if !entry.isPlaying {
-                        Text("pausado")
+                        Text("paused")
                             .font(.system(size: 10))
                             .foregroundStyle(.tertiary)
                     }
@@ -40,14 +40,14 @@ struct AppRow: View {
                         }
                         .buttonStyle(.plain)
                         .foregroundStyle(.secondary)
-                        .help("Voltar para 100%")
+                        .help("Reset volume")
                     }
-                    Text(entry.muted ? "mudo" : "\(percent)%")
+                    Text(entry.muted ? String(localized: "muted") : "\(percent)%")
                         .font(.system(size: 11, weight: .medium).monospacedDigit())
                         .foregroundStyle(entry.volume > 1.001 && !entry.muted ? Color.orange : .secondary)
                         .frame(width: 38, alignment: .trailing)
                         .onTapGesture(count: 2) { mixer.reset(entry.id) }
-                        .help("Clique duas vezes para voltar a 100%")
+                        .help("Double-click to reset")
                 }
 
                 HStack(spacing: 6) {
@@ -59,7 +59,7 @@ struct AppRow: View {
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(entry.muted ? Color.red : .secondary)
-                    .help(entry.muted ? "Ativar som" : "Silenciar")
+                    .help(entry.muted ? String(localized: "Unmute") : String(localized: "Mute"))
 
                     VStack(spacing: 3) {
                         VolumeSlider(value: Binding(

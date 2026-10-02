@@ -30,7 +30,7 @@ final class AppTap {
         self.outputDeviceID = outputDevice
 
         guard let outputUID = AudioDevices.uid(of: outputDevice) else {
-            throw CoreAudioError(status: kAudioHardwareBadDeviceError, context: "saída sem UID")
+            throw CoreAudioError(status: kAudioHardwareBadDeviceError, context: "output device has no UID")
         }
 
         let stereo = AudioDevices.stereoChannels(of: outputDevice)
@@ -58,7 +58,7 @@ final class AppTap {
         description.muteBehavior = .mutedWhenTapped
         description.isPrivate = true
 
-        try check(AudioHardwareCreateProcessTap(description, &tapID), "criar tap")
+        try check(AudioHardwareCreateProcessTap(description, &tapID), "create tap")
         self.description = description
 
         let aggregate: [String: Any] = [
@@ -74,15 +74,15 @@ final class AppTap {
                 kAudioSubTapDriftCompensationKey: true,
             ]],
         ]
-        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &aggregateID), "criar dispositivo agregado")
+        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &aggregateID), "create aggregate device")
 
         let context = self.context
         try check(AudioDeviceCreateIOProcIDWithBlock(&ioProcID, aggregateID, nil) { _, input, _, output, _ in
             context.render(input: input, output: output)
-        }, "criar IO proc")
+        }, "create IO proc")
 
         disableDeviceInputs()
-        try check(AudioDeviceStart(aggregateID, ioProcID), "iniciar áudio")
+        try check(AudioDeviceStart(aggregateID, ioProcID), "start audio")
     }
 
     /// The aggregate also exposes the output device's own inputs (AirPods' mic, an interface's line in).

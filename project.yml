@@ -1,15 +1,18 @@
 name: Fader
 options:
   bundleIdPrefix: com.lokasta
+  developmentLanguage: en
   deploymentTarget:
     macOS: "15.0"
   createIntermediateGroups: true
+configFiles:
+  Debug: Config/Signing.xcconfig
+  Release: Config/Signing.xcconfig
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.5.1"
-    CURRENT_PROJECT_VERSION: "7"
-    DEVELOPMENT_TEAM: N45547YJ4V
+    MARKETING_VERSION: "1.6.0"
+    CURRENT_PROJECT_VERSION: "8"
 targets:
   Fader:
     type: application
@@ -21,17 +24,17 @@ targets:
     info:
       path: Fader/Info.plist
       properties:
-        CFBundleDisplayName: Fader
+        CFBundleDisplayName: "Lokasta's Fader"
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.utilities
-        NSHumanReadableCopyright: "Lokasta"
+        NSHumanReadableCopyright: "© 2026 Lokasta. MIT License."
         CFBundleURLTypes:
           - CFBundleURLName: com.lokasta.fader
             CFBundleURLSchemes: [fader]
-        NSMicrophoneUsageDescription: "O Fader mostra o nível do seu microfone enquanto o painel está aberto. Nada é gravado."
-        NSAudioCaptureUsageDescription: "O Fader precisa acessar o áudio de cada app para controlar o volume dele individualmente. Nada é gravado nem sai do seu Mac."
+        NSMicrophoneUsageDescription: "Fader shows your microphone's level while its panel is open. Nothing is recorded."
+        NSAudioCaptureUsageDescription: "Fader needs access to each app's audio to control its volume individually. Nothing is recorded or leaves your Mac."
     entitlements:
       path: Fader/Fader.entitlements
       properties:
@@ -39,8 +42,6 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.lokasta.fader
-        CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "Developer ID Application"
         ENABLE_HARDENED_RUNTIME: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         COMBINE_HIDPI_IMAGES: YES
@@ -64,8 +65,6 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.lokasta.fader.controls
-        CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "Developer ID Application"
         ENABLE_HARDENED_RUNTIME: YES
         SKIP_INSTALL: YES
   FaderTests:
@@ -78,8 +77,6 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.lokasta.fader.tests
         GENERATE_INFOPLIST_FILE: YES
-        CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "Developer ID Application"
         TEST_HOST: $(BUILT_PRODUCTS_DIR)/Fader.app/Contents/MacOS/Fader
         BUNDLE_LOADER: $(TEST_HOST)
 schemes:

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-02 -- 1.6.0
+
+**Open source prep.**
+
+- Name: **Lokasta's Fader** (display name; the bundle stays `Fader.app`, `com.lokasta.fader`).
+- English UI by default with a Brazilian Portuguese translation (`Localizable.xcstrings`, `InfoPlist.xcstrings`, widget catalog). Follows the system language.
+- Signing moved to `Config/Signing.xcconfig`: ad-hoc for contributors, `Config/Local.xcconfig` (gitignored) for the maintainer's Developer ID.
+- `scripts/release.sh`: Release build, DMG, Developer ID signature, notarization and stapling; fails fast without notary credentials.
+- Docs: English README, `AGENTS.md` (architecture, safety rules, how to verify without hearing; `CLAUDE.md` imports it), `SECURITY.md`, MIT `LICENSE`.
+- **Fix**: other running copies of Fader no longer show up in the app list.
+
 ## 2026-10-02 -- 1.5.1
 
 **Performance**: lighter idle loop. Measured 7.2% CPU with the panel open before, 0.56% with the panel closed and one app being mixed after.

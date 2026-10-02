@@ -51,7 +51,7 @@ private struct DeviceSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
-                Text(isOutput ? "SAÍDA" : "MICROFONE")
+                Text(isOutput ? String(localized: "OUTPUT") : String(localized: "MICROPHONE"))
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.tertiary)
                 Spacer()
@@ -68,14 +68,14 @@ private struct DeviceSection: View {
                         }
                     }
                 } label: {
-                    Text(state.currentDevice?.name ?? (isOutput ? "Sem saída" : "Sem microfone"))
+                    Text(state.currentDevice?.name ?? (isOutput ? String(localized: "No output") : String(localized: "No microphone")))
                         .font(.system(size: 12, weight: .medium))
                         .lineLimit(1)
                 }
                 .menuStyle(.borderlessButton)
                 .fixedSize()
                 .disabled(state.devices.isEmpty)
-                .help(isOutput ? "Trocar a saída de áudio" : "Trocar o microfone padrão")
+                .help(isOutput ? String(localized: "Change the audio output") : String(localized: "Change the default microphone"))
             }
 
             HStack(spacing: 8) {
@@ -87,7 +87,7 @@ private struct DeviceSection: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(state.muted ? Color.red : .secondary)
                 .disabled(!state.muteSettable)
-                .help(state.muted ? "Ativar" : (isOutput ? "Silenciar tudo" : "Silenciar microfone"))
+                .help(state.muted ? String(localized: "Unmute") : (isOutput ? String(localized: "Mute everything") : String(localized: "Mute microphone")))
 
                 Slider(
                     value: Binding(get: { Double(shownVolume) }, set: { mixer.setDeviceVolume(Float($0), direction) }),
@@ -96,12 +96,12 @@ private struct DeviceSection: View {
                 .controlSize(.small)
                 .disabled(!state.volumeSettable)
 
-                Text(state.muted ? "mudo" : state.volumeSettable ? "\(Int((shownVolume * 100).rounded()))%" : "fixo")
+                Text(state.muted ? String(localized: "muted") : state.volumeSettable ? "\(Int((shownVolume * 100).rounded()))%" : String(localized: "fixed"))
                     .font(.system(size: 11, weight: .medium).monospacedDigit())
                     .foregroundStyle(.secondary)
                     .frame(width: 38, alignment: .trailing)
             }
-            .help(state.volumeSettable ? "" : "Esse dispositivo não deixa o macOS mudar o volume")
+            .help(state.volumeSettable ? "" : String(localized: "This device doesn't let macOS change its volume"))
 
             DeviceLevel(levels: mixer.levels, direction: direction)
                 .padding(.leading, 26)
@@ -128,9 +128,9 @@ private struct DeviceLevel: View {
             case .on, .unavailable:
                 LevelBar(level: levels.mic)
             case .bluetooth:
-                note("Medidor desligado em mic Bluetooth (pra não derrubar a qualidade do fone)")
+                note(String(localized: "Meter off for Bluetooth mics (keeps your headset sounding good)"))
             case .noPermission:
-                note("Permita o microfone pro Fader pra ver o nível")
+                note(String(localized: "Allow microphone access to see the level"))
             }
         }
     }
@@ -155,15 +155,15 @@ private struct PermissionBanner: View {
                 .font(.system(size: 16))
                 .foregroundStyle(.orange)
             VStack(alignment: .leading, spacing: 6) {
-                Text("Falta uma permissão")
+                Text("One permission missing")
                     .font(.system(size: 12, weight: .semibold))
                 Text(mixer.permission == .denied
-                     ? "Libere o Fader em Ajustes > Privacidade e Segurança > Gravação de Tela e Áudio do Sistema."
-                     : "O macOS precisa deixar o Fader acessar o áudio dos apps. Nada é gravado.")
+                     ? String(localized: "Allow Fader in System Settings > Privacy & Security > Screen & System Audio Recording.")
+                     : String(localized: "macOS needs to let Fader access app audio. Nothing is recorded."))
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                Button(mixer.permission == .denied ? "Abrir Ajustes" : "Permitir", action: mixer.requestPermission)
+                Button(mixer.permission == .denied ? String(localized: "Open Settings") : String(localized: "Allow"), action: mixer.requestPermission)
                     .controlSize(.small)
             }
         }
@@ -184,9 +184,9 @@ private struct AppsSection: View {
                 Image(systemName: "waveform")
                     .font(.system(size: 22))
                     .foregroundStyle(.tertiary)
-                Text("Nenhum app tocando áudio")
+                Text("No app is playing audio")
                     .font(.system(size: 12, weight: .medium))
-                Text("Dá play em alguma coisa e ela aparece aqui.")
+                Text("Play something and it shows up here.")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
             }
@@ -216,12 +216,12 @@ private struct FooterSection: View {
     var body: some View {
         HStack {
             Menu {
-                Toggle("Abrir ao iniciar o Mac", isOn: Binding(get: { mixer.launchAtLogin }, set: mixer.setLaunchAtLogin))
-                Toggle("Lembrar o volume de cada app", isOn: Binding(get: { mixer.rememberVolumes }, set: mixer.setRememberVolumes))
-                Toggle("Tecla de Ditado (F5) abre o Fader", isOn: Binding(get: { mixer.dictationKeyOpensPanel }, set: mixer.setDictationKeyOpensPanel))
-                Text("Atalho: ⌃⌥V")
+                Toggle("Open at login", isOn: Binding(get: { mixer.launchAtLogin }, set: mixer.setLaunchAtLogin))
+                Toggle("Remember each app's volume", isOn: Binding(get: { mixer.rememberVolumes }, set: mixer.setRememberVolumes))
+                Toggle("Dictation key (F5) opens Fader", isOn: Binding(get: { mixer.dictationKeyOpensPanel }, set: mixer.setDictationKeyOpensPanel))
+                Text("Shortcut: ⌃⌥V")
                 Divider()
-                Button("Abrir Ajustes de Som…") {
+                Button("Open Sound Settings…") {
                     NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Sound-Settings.extension")!)
                 }
             } label: {
@@ -230,17 +230,17 @@ private struct FooterSection: View {
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
             .fixedSize()
-            .help("Opções")
+            .help("Options")
 
             Spacer()
 
-            Text("Fader \(Bundle.main.shortVersion)")
+            Text(verbatim: "Lokasta's Fader \(Bundle.main.shortVersion)")
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
 
             Spacer()
 
-            Button("Sair") { NSApp.terminate(nil) }
+            Button("Quit") { NSApp.terminate(nil) }
                 .buttonStyle(.plain)
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)

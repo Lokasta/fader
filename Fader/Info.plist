@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Fader</string>
+	<string>Lokasta's Fader</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -36,10 +36,10 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSAudioCaptureUsageDescription</key>
-	<string>O Fader precisa acessar o áudio de cada app para controlar o volume dele individualmente. Nada é gravado nem sai do seu Mac.</string>
+	<string>Fader needs access to each app's audio to control its volume individually. Nothing is recorded or leaves your Mac.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Lokasta</string>
+	<string>© 2026 Lokasta. MIT License.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>O Fader mostra o nível do seu microfone enquanto o painel está aberto. Nada é gravado.</string>
+	<string>Fader shows your microphone's level while its panel is open. Nothing is recorded.</string>
 </dict>
 </plist>

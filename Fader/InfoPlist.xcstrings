@@ -1,0 +1,26 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "NSAudioCaptureUsageDescription": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Fader precisa acessar o áudio de cada app para controlar o volume dele individualmente. Nada é gravado nem sai do seu Mac."
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Fader mostra o nível do seu microfone enquanto o painel está aberto. Nada é gravado."
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+// Contributors build ad-hoc signed out of the box.
+// To sign with your own certificate, create Config/Local.xcconfig (gitignored), e.g.:
+//   CODE_SIGN_IDENTITY = Developer ID Application
+//   DEVELOPMENT_TEAM = ABCDE12345
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = -
+DEVELOPMENT_TEAM =
+
+#include? "Local.xcconfig"

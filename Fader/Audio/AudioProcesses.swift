@@ -33,7 +33,7 @@ enum AudioProcesses {
 
     /// PID and bundle ID never change for a process object, so they're read once.
     /// Only "is it playing" is polled.
-    @MainActor private static var known: [AudioObjectID: (pid: pid_t, bundleID: String?)] = [:]
+    @MainActor private static var known: [AudioObjectID: (pid: pid_t, bundleID: String?, isFader: Bool)] = [:]
 
     @MainActor
     static func list() -> [AudioProcess] {
@@ -41,15 +41,17 @@ enum AudioProcesses {
         let ids = (try? AudioObjectID.system.readArray(kAudioHardwarePropertyProcessObjectList, element: AudioObjectID.unknown)) ?? []
         known = known.filter { ids.contains($0.key) }
         return ids.compactMap { id in
-            let info: (pid: pid_t, bundleID: String?)
+            let info: (pid: pid_t, bundleID: String?, isFader: Bool)
             if let cached = known[id] {
                 info = cached
             } else {
                 guard let pid: pid_t = try? id.read(kAudioProcessPropertyPID, default: pid_t(-1)), pid > 0 else { return nil }
-                info = (pid, try? id.readString(kAudioProcessPropertyBundleID))
+                // Fader's own output is a Core Audio process too, in this copy or any other one.
+                let isFader = pid == ownPID || NSRunningApplication(processIdentifier: pid)?.bundleIdentifier == Bundle.main.bundleIdentifier
+                info = (pid, try? id.readString(kAudioProcessPropertyBundleID), isFader)
                 known[id] = info
             }
-            guard info.pid != ownPID else { return nil }
+            guard !info.isFader else { return nil }
             let running: UInt32 = (try? id.read(kAudioProcessPropertyIsRunningOutput, default: UInt32(0))) ?? 0
             return AudioProcess(objectID: id, pid: info.pid, isPlaying: running != 0, bundleID: info.bundleID)
         }
@@ -57,11 +59,11 @@ enum AudioProcesses {
 
     /// macOS services that play sound on their own, shown with a name a person recognizes.
     private static let systemServices: [String: (name: String, symbol: String)] = [
-        "systemsoundserverd": ("Sons do sistema", "bell.fill"),
-        "com.apple.systemsoundserverd": ("Sons do sistema", "bell.fill"),
-        "com.apple.SpeechSynthesisServerXPC": ("Fala do sistema", "waveform"),
-        "com.apple.speech.speechsynthesisd": ("Fala do sistema", "waveform"),
-        "com.apple.accessibility.heard": ("Acessibilidade", "accessibility"),
+        "systemsoundserverd": (String(localized: "System Sounds"), "bell.fill"),
+        "com.apple.systemsoundserverd": (String(localized: "System Sounds"), "bell.fill"),
+        "com.apple.SpeechSynthesisServerXPC": (String(localized: "System Speech"), "waveform"),
+        "com.apple.speech.speechsynthesisd": (String(localized: "System Speech"), "waveform"),
+        "com.apple.accessibility.heard": (String(localized: "Accessibility"), "accessibility"),
         "com.apple.CoreSpeech": ("Siri", "mic.fill"),
         "com.apple.assistantd": ("Siri", "mic.fill"),
     ]
@@ -80,7 +82,7 @@ enum AudioProcesses {
             return AudioAppIdentity(key: "service:\(service.name)", name: service.name, bundleID: bundleID, icon: symbolIcon(service.symbol))
         }
         let fallbackName = process.bundleID.flatMap { $0.split(separator: ".").last.map(String.init) }
-        let name = processName(ownerPID) ?? processName(pid) ?? fallbackName ?? "Processo \(pid)"
+        let name = processName(ownerPID) ?? processName(pid) ?? fallbackName ?? String(localized: "Process \(Int(pid))")
         return AudioAppIdentity(key: "name:\(name)", name: name, bundleID: process.bundleID, icon: NSWorkspace.shared.icon(for: .unixExecutable))
     }
 

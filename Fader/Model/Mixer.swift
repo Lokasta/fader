@@ -275,7 +275,7 @@ final class Mixer: ObservableObject {
         } catch {
             let id = entry.id
             log.error("tap for \(id, privacy: .public) failed: \(String(describing: error), privacy: .public)")
-            entry.failure = "Não consegui controlar esse app"
+            entry.failure = String(localized: "Couldn't control this app")
             failedAttempts[entry.id] = attempt
         }
     }
