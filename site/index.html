@@ -161,7 +161,7 @@ h1 {
   font-size: clamp(44px, 7vw, 80px); line-height: 0.98; letter-spacing: -0.035em;
   margin: 0 0 22px;
 }
-h1 .grad {
+h1 .grad, .finale .grad {
   background: linear-gradient(100deg, var(--accent) 10%, var(--cyan) 90%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
@@ -380,18 +380,6 @@ h2 {
 
 /* ---------- How it works ---------- */
 .how { background: var(--bg-2); }
-.steps { margin: 48px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: s; position: relative; }
-.steps li {
-  counter-increment: s; position: relative;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 26px 24px;
-}
-.steps li::before {
-  content: "0" counter(s);
-  display: block; font-family: var(--mono); font-size: 13px; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 18px;
-}
-.steps h3 { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.02em; margin: 0 0 8px; }
-.steps p { margin: 0; color: var(--muted); font-size: 15.5px; }
 .signal {
   margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
   font-family: var(--mono); font-size: 13px; color: var(--muted);
@@ -411,35 +399,8 @@ h2 {
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .big-zero-cap { font-family: var(--mono); font-size: 13px; color: var(--faint); letter-spacing: 0.08em; text-transform: uppercase; }
-.perm { display: grid; gap: 14px; }
-.perm div {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 22px;
-}
-.perm h3 { margin: 0 0 6px; font-size: 17px; font-weight: 650; display: flex; align-items: center; gap: 10px; }
-.perm h3 .tag {
-  font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--faint); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px;
-}
-.perm p { margin: 0; color: var(--muted); font-size: 15.5px; }
-.perm a { color: var(--text); }
 
 /* ---------- Install ---------- */
-.install-steps { margin: 44px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: i; }
-.install-steps li {
-  counter-increment: i;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 22px;
-  display: flex; flex-direction: column;
-}
-.install-steps li::before {
-  content: counter(i);
-  width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
-  font-family: var(--mono); font-size: 14px; font-weight: 500;
-  background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--text);
-  margin-bottom: 16px;
-}
-.install-steps h3 { margin: 0 0 6px; font-size: 17px; font-weight: 650; }
-.install-steps p { margin: 0; color: var(--muted); font-size: 15px; }
-.install-steps .opt-tag { font-family: var(--mono); font-size: 11px; color: var(--faint); text-transform: uppercase; letter-spacing: 0.08em; margin-left: 6px; font-weight: 500; }
 .install-cta { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
 .reqs { color: var(--faint); font-size: 14.5px; margin: 0; }
 
@@ -474,13 +435,6 @@ pre .c { color: #7e78a3; }
   display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center;
 }
 .agents h2 { font-size: clamp(30px, 4vw, 44px); }
-.agents .prompt {
-  font-family: var(--mono); font-size: 14px; line-height: 1.7;
-  background: #0a0816; color: #e7e3ff; border-radius: 14px; padding: 20px 20px;
-  border: 1px solid rgba(255,255,255,0.08);
-}
-.agents .prompt .u { color: #8cd9ff; }
-.agents .prompt .dim { color: #7e78a3; }
 .agents .lede { font-size: 17px; }
 .agents .lede + .cta { margin-top: 24px; }
 
@@ -498,6 +452,10 @@ footer nav a:hover { color: var(--text); }
 @keyframes boost-num { 0% { opacity: 1; } }
 @keyframes vm { from { transform: scaleX(var(--lo)); } to { transform: scaleX(var(--hi)); } }
 @keyframes rem { 0%, 20% { width: 50%; } 45%, 100% { width: 20%; } }
+@keyframes wave-run { to { stroke-dashoffset: -20; } }
+@keyframes wire-run { 0% { left: -6px; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+@keyframes dl { 0% { width: 4%; } 70%, 100% { width: 100%; } }
+@keyframes blink { 50% { opacity: 0; } }
 @keyframes breathe { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 9% 0 0); } }
 @media (prefers-reduced-motion: no-preference) {
   .mac.mini .mac-meter { animation: breathe 1.3s ease-in-out infinite alternate; transform-origin: left; }
@@ -510,6 +468,11 @@ footer nav a:hover { color: var(--text); }
   .boost-pct .n200 { animation: boost-num 5s steps(1) infinite; }
   .vm b { animation: vm var(--d) ease-in-out infinite alternate; }
   .rem-bar i { animation: rem 4s ease-in-out infinite; }
+  .flow-wave .wave path, .gw .wave path { stroke-dasharray: 6 4; animation: wave-run 1.2s linear infinite; }
+  .signal .wire i { animation: wire-run 2.4s linear infinite; }
+  .signal .wire:nth-of-type(4) i { animation-delay: .6s; } .signal .wire:nth-of-type(6) i { animation-delay: 1.2s; } .signal .wire:nth-of-type(8) i { animation-delay: 1.8s; }
+  .dl-bar i { animation: dl 3.5s ease-out infinite; }
+  .caret { animation: blink 1s steps(1) infinite; }
   .panel-shot { transition: transform 0.6s cubic-bezier(.2,.8,.2,1); }
   .stage:hover .panel-shot { transform: perspective(1400px) rotateY(-2deg) rotateX(1deg); }
 }
@@ -525,7 +488,8 @@ footer nav a:hover { color: var(--text); }
   .hero .wrap, .why .wrap, .privacy .wrap, .agents .box { grid-template-columns: 1fr; }
   .hero { padding-block: 24px 72px; }
   .stage { max-width: 520px; }
-  .bento { grid-template-columns: repeat(2, 1fr); }
+  .bento, .bento.steps4 { grid-template-columns: repeat(2, 1fr); }
+  .bento.steps3 { grid-template-columns: 1fr; }
   .tile, .tile.t-wide { grid-column: span 1; }
   .install-steps { grid-template-columns: repeat(2, 1fr); }
   .steps { grid-template-columns: 1fr; }
@@ -534,7 +498,7 @@ footer nav a:hover { color: var(--text); }
   body { font-size: 16px; }
   section { padding-block: 64px; }
   .install-steps { grid-template-columns: 1fr; }
-  .bento { grid-template-columns: 1fr; }
+  .bento, .bento.steps4 { grid-template-columns: 1fr; }
   .cta .btn, .install-cta .btn { width: 100%; }
   .panel-shot { transform: none; }
   .compare { grid-template-columns: 1fr; }
@@ -589,6 +553,118 @@ footer nav a:hover { color: var(--text); }
 .mac-foot span:nth-child(2) { color: #5f5f64; font-size: 11px; }
 .mac-gear { font-size: 15px; }
 .demo-hint { margin: 14px 8px 0; text-align: right; font-family: var(--mono); font-size: 12px; color: var(--faint); }
+
+/* ---------- Sections polish: steps, settings, install, terminal, finale ---------- */
+.bento.steps3 .tile { grid-column: span 2; }
+.bento.steps4 { grid-template-columns: repeat(4, 1fr); }
+.bento.steps4 .tile { grid-column: span 1; }
+.step-n { display: block; margin: 18px 6px 0; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; color: var(--accent); text-transform: uppercase; }
+.step-n + h3 { margin-top: 6px; }
+.tile code { font-family: var(--mono); font-size: .88em; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); }
+
+/* how: tap */
+.viz .wave { width: 100%; height: 100%; }
+.flow { display: flex; align-items: center; gap: 10px; }
+.app-ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; flex: none;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--app) 85%, #fff), var(--app)); box-shadow: 0 4px 10px rgba(0,0,0,.35); }
+.app-ic svg { width: 22px; height: 22px; }
+.flow-wave { width: 110px; height: 34px; color: #ff7aa6; }
+.node-ic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff;
+  background: linear-gradient(160deg, #8b6dff, #5b3df0); box-shadow: 0 0 0 6px rgba(123,92,255,.18); }
+.node-ic svg { width: 20px; height: 20px; }
+.muted-line { margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: #8d89a8; }
+.muted-line svg { width: 14px; height: 14px; color: #ff6b6b; }
+/* how: aggregate */
+.agg { display: flex; align-items: center; gap: 8px; }
+.agg-in { display: grid; gap: 10px; }
+.pill2 { padding: 7px 11px; border-radius: 9px; font-size: 12.5px; background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); white-space: nowrap; }
+.agg-brace { width: 18px; height: 78px; color: #8d89a8; }
+.agg-out { padding: 10px 12px; border-radius: 11px; background: linear-gradient(160deg, rgba(139,109,255,.35), rgba(91,61,240,.25)); box-shadow: inset 0 0 0 1px rgba(160,140,255,.35); display: grid; gap: 2px; }
+.agg-out b { font-size: 13px; }
+.agg-out small { font-family: var(--mono); font-size: 10.5px; color: #b9b2e0; }
+/* how: gain */
+.gain { display: flex; align-items: center; gap: 10px; }
+.gw { width: 80px; color: #8cd9ff; }
+.gw.big { height: 44px; }
+.gw.small { height: 18px; color: #34c759; }
+.gx { font-family: var(--mono); font-size: 13px; padding: 6px 9px; border-radius: 8px; background: rgba(255,255,255,.08); white-space: nowrap; }
+.signal .wire { position: relative; overflow: hidden; }
+.signal .wire i { position: absolute; top: -2px; left: -6px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 8px #8cd9ff; opacity: 0; }
+
+/* privacy: System Settings replica */
+.perm-col { display: grid; gap: 16px; }
+.settings, .dmg, .term { border-radius: 14px; overflow: hidden; background: #1e1d22; color: #ececf1; box-shadow: 0 24px 60px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+.win-bar { display: flex; align-items: center; gap: 7px; padding: 11px 13px; background: #2a2930; border-bottom: 1px solid rgba(0,0,0,.4); }
+.tl { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+.tl.r { background: #ff5f57; } .tl.y { background: #febc2e; } .tl.g { background: #28c840; }
+.win-title { flex: 1; text-align: center; margin-right: 50px; font-size: 13px; font-weight: 600; color: #c9c7d2; }
+.set-group { margin: 14px; border-radius: 10px; background: #26252b; box-shadow: inset 0 0 0 1px rgba(255,255,255,.05); }
+.set-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13.5px; }
+.set-head b { flex: 1; font-weight: 600; }
+.set-ic { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; background: var(--c); flex: none; }
+.set-ic svg { width: 16px; height: 16px; }
+.req { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 7px; border-radius: 6px; color: #ffb3c1; background: rgba(255,55,95,.15); }
+.req.opt { color: #ffd38a; background: rgba(255,159,10,.15); }
+.set-row { display: flex; align-items: center; gap: 10px; padding: 11px 14px; font-size: 13.5px; }
+.set-row img { border-radius: 5px; }
+.set-row span:not(.tog) { flex: 1; }
+.tog { width: 38px; height: 22px; border-radius: 11px; background: #48474e; position: relative; flex: none; }
+.tog::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+.tog.on { background: #30d158; } .tog.on::after { left: 18px; }
+.set-note { margin: 0; padding: 0 14px 14px 50px; font-size: 12.5px; line-height: 1.5; color: #9d9ba8; }
+.quit-note { display: flex; gap: 12px; align-items: flex-start; margin: 0; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 15px; }
+.quit-note svg { width: 20px; height: 20px; flex: none; margin-top: 2px; color: var(--accent); }
+.quit-note strong { color: var(--text); }
+.quit-note a { color: var(--text); }
+
+/* install */
+.dl { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: rgba(40,39,48,.95); box-shadow: 0 10px 26px rgba(0,0,0,.4), inset 0 0 0 .5px rgba(255,255,255,.15); width: min(200px, 100%); }
+.dl-file svg { width: 36px; height: 36px; }
+.dl-body { flex: 1; display: grid; gap: 6px; font-size: 12.5px; }
+.dl-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,.12); overflow: hidden; }
+.dl-bar i { display: block; height: 100%; width: 100%; background: #0a84ff; border-radius: 2px; }
+.dl-body small { font-size: 10.5px; color: #9d9ba8; }
+.viz-dmg { padding: 14px; }
+.dmg { width: 220px; }
+.dmg .win-bar { padding: 8px 10px; } .dmg .tl { width: 9px; height: 9px; } .dmg .win-title { font-size: 11px; margin-right: 34px; }
+.dmg-body { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 14px; }
+.dmg-item { display: grid; justify-items: center; gap: 4px; font-size: 11px; color: #c9c7d2; }
+.dmg-item img { border-radius: 9px; }
+.folder { width: 44px; height: 38px; }
+.dmg-arrow { width: 52px; color: #8d89a8; }
+.alert { width: 210px; display: grid; justify-items: center; gap: 10px; padding: 16px 14px 12px; border-radius: 14px; text-align: center; background: rgba(44,43,52,.97);
+  box-shadow: 0 14px 34px rgba(0,0,0,.45), inset 0 0 0 .5px rgba(255,255,255,.15); font-size: 12px; line-height: 1.35; }
+.alert img { border-radius: 8px; }
+.alert-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; margin-top: 2px; }
+.alert-btns span { padding: 5px 0; border-radius: 7px; background: rgba(255,255,255,.12); font-size: 11.5px; }
+.alert-btns .primary { background: #0a84ff; color: #fff; font-weight: 600; }
+.ccg { display: grid; grid-template-columns: repeat(3, 44px); gap: 10px; }
+.ccb { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.12); }
+.ccb.fader { position: relative; display: grid; place-items: center; color: #fff; background: linear-gradient(160deg, #7b5cff, #4a2fd6); box-shadow: 0 0 0 3px rgba(255,255,255,.75), 0 8px 18px rgba(91,61,240,.5); }
+.ccb.fader svg { width: 20px; height: 20px; }
+.ccb.fader i { position: absolute; top: -6px; left: -6px; width: 18px; height: 18px; border-radius: 50%; background: #30d158; color: #fff; font-style: normal; font-size: 14px; font-weight: 700; line-height: 18px; text-align: center; }
+
+/* agents: terminal */
+.term { background: #0f0e16; }
+.term .win-bar { background: #1b1a24; }
+.term-body { padding: 16px 18px 18px; font-family: var(--mono); font-size: 13px; line-height: 1.85; color: #d9d6ee; overflow-x: auto; }
+.term-body div { white-space: nowrap; }
+.term-body .ps { color: #6f6a8c; margin-right: 8px; }
+.term-body .ask { color: #fff; margin-top: 6px; }
+.term-body .u { color: #8cd9ff; margin-right: 8px; }
+.term-body .out { color: #a8a3c6; padding-left: 4px; }
+.term-body .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #8b6dff; margin-right: 10px; vertical-align: middle; }
+.term-body .out.ok .dot { background: #30d158; }
+.caret { display: inline-block; width: 8px; height: 15px; margin-left: 4px; vertical-align: -2px; background: #d9d6ee; }
+
+/* finale */
+.finale { text-align: center; padding-block: 110px 120px;
+  background: radial-gradient(60% 70% at 50% 100%, var(--glow), transparent 70%); }
+.finale img { display: block; margin: 0 auto; filter: drop-shadow(0 18px 30px var(--glow)); }
+.finale h2 { font-size: clamp(38px, 6vw, 68px); margin: 26px 0 10px; }
+.finale .lede { margin: 0 auto; }
+.finale .cta { justify-content: center; margin-top: 30px; }
 </style>
 </head>
 <body>
@@ -850,26 +926,52 @@ footer nav a:hover { color: var(--text); }
     <h2 id="how-title">Built on Core Audio Process Taps.</h2>
     <p class="lede">Apple added process taps in macOS 14.2. Fader uses them to touch only the apps you change, and installs nothing in the system.</p>
 
-    <ol class="steps">
-      <li>
+    <div class="bento steps3">
+      <article class="tile">
+        <div class="viz viz-tap" aria-hidden="true">
+          <div class="flow">
+            <span class="app-ic" style="--app:#ff4f8b"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="18" r="2.4" fill="#fff"/><circle cx="17" cy="16" r="2.4" fill="#fff"/></svg></span>
+            <span class="flow-wave"><svg class="wave" viewBox="0 0 120 40" preserveAspectRatio="none"><path d="M0 20 Q 5 4 10 20 T 20 20 T 30 20 Q 35 8 40 20 T 50 20 Q 55 2 60 20 T 70 20 Q 75 10 80 20 T 90 20 Q 95 5 100 20 T 110 20 T 120 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg></span>
+            <span class="node-ic"><svg viewBox="0 0 24 24"><path d="M12 3v7M7 7l5 5 5-5M5 14v3a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+          <div class="muted-line"><svg viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3z" fill="currentColor"/><path d="m16 9 6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>original output muted</div>
+        </div>
+        <span class="step-n">01</span>
         <h3>Process tap</h3>
         <p>A tap captures the app's processes and, with <code>mutedWhenTapped</code>, keeps them from reaching the speakers directly.</p>
-      </li>
-      <li>
+      </article>
+      <article class="tile">
+        <div class="viz viz-agg" aria-hidden="true">
+          <div class="agg">
+            <div class="agg-in"><span class="pill2">Process tap</span><span class="pill2">MacBook Pro Speakers</span></div>
+            <svg class="agg-brace" viewBox="0 0 24 60" preserveAspectRatio="none"><path d="M2 4 C 14 4 10 30 22 30 C 10 30 14 56 2 56" fill="none" stroke="currentColor" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>
+            <div class="agg-out"><b>Aggregate device</b><small>private to Fader</small></div>
+          </div>
+        </div>
+        <span class="step-n">02</span>
         <h3>Private aggregate device</h3>
         <p>A private aggregate device, visible only to Fader, pairs that tap with your current output.</p>
-      </li>
-      <li>
+      </article>
+      <article class="tile">
+        <div class="viz viz-gain" aria-hidden="true">
+          <div class="gain">
+            <span class="gw big"><svg class="wave" viewBox="0 0 120 40" preserveAspectRatio="none"><path d="M0 20 Q 5 4 10 20 T 20 20 T 30 20 Q 35 8 40 20 T 50 20 Q 55 2 60 20 T 70 20 Q 75 10 80 20 T 90 20 Q 95 5 100 20 T 110 20 T 120 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg></span>
+            <span class="gx">&#215; 0.40</span>
+            <span class="gw small"><svg class="wave" viewBox="0 0 120 40" preserveAspectRatio="none"><path d="M0 20 Q 5 4 10 20 T 20 20 T 30 20 Q 35 8 40 20 T 50 20 Q 55 2 60 20 T 70 20 Q 75 10 80 20 T 90 20 Q 95 5 100 20 T 110 20 T 120 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg></span>
+          </div>
+          <div class="muted-line">ramped per buffer, never clicks</div>
+        </div>
+        <span class="step-n">03</span>
         <h3>Real-time IO proc</h3>
         <p>An IO proc copies the samples to the output with your gain, ramped per buffer so changes never click.</p>
-      </li>
-    </ol>
+      </article>
+    </div>
 
     <div class="signal" aria-label="Signal path: app, process tap, aggregate device, IO proc with gain, your speakers">
-      <span class="node">App</span><span class="wire"></span>
-      <span class="node hl">Process tap</span><span class="wire"></span>
-      <span class="node hl">Aggregate device</span><span class="wire"></span>
-      <span class="node hl">IO proc &#215; gain</span><span class="wire"></span>
+      <span class="node">App</span><span class="wire"><i></i></span>
+      <span class="node hl">Process tap</span><span class="wire"><i></i></span>
+      <span class="node hl">Aggregate device</span><span class="wire"><i></i></span>
+      <span class="node hl">IO proc &#215; gain</span><span class="wire"><i></i></span>
       <span class="node">Your speakers</span>
     </div>
 
@@ -887,19 +989,21 @@ footer nav a:hover { color: var(--text); }
       <p class="big-zero" aria-hidden="true">0</p>
       <p class="big-zero-cap">network requests, analytics, crash reports</p>
     </div>
-    <div class="perm">
-      <div>
-        <h3>System Audio Recording <span class="tag">Required</span></h3>
-        <p>Process taps read each app's audio so Fader can change its volume and show its level. Nothing is recorded: audio is processed in memory, in real time, then discarded.</p>
+    <div class="perm-col">
+      <div class="settings" aria-label="macOS System Settings showing Fader's two permissions">
+        <div class="win-bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="win-title">Privacy &amp; Security</span></div>
+        <div class="set-group">
+          <div class="set-head"><span class="set-ic" style="--c:#ff375f"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2" fill="none" stroke="#fff" stroke-width="2"/><circle cx="12" cy="11" r="2.6" fill="#fff"/><path d="M8 21h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span><b>Screen &amp; System Audio Recording</b><span class="req">Required</span></div>
+          <div class="set-row"><img src="assets/icon.png" alt="" width="22" height="22"><span>Lokasta's Fader</span><span class="tog on"></span></div>
+          <p class="set-note">Reads each app's audio to change its volume and show its level. Processed in memory, in real time, then discarded.</p>
+        </div>
+        <div class="set-group">
+          <div class="set-head"><span class="set-ic" style="--c:#ff9f0a"><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3" fill="#fff"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span><b>Microphone</b><span class="req opt">Optional</span></div>
+          <div class="set-row"><img src="assets/icon.png" alt="" width="22" height="22"><span>Lokasta's Fader</span><span class="tog on"></span></div>
+          <p class="set-note">Only for the mic meter, only while the panel is open, never on Bluetooth mics. Deny it and everything else still works.</p>
+        </div>
       </div>
-      <div>
-        <h3>Microphone <span class="tag">Optional</span></h3>
-        <p>Only for the microphone level meter, only while the panel is open, and never on Bluetooth microphones (that would switch your headphones to call quality). Deny it and everything else still works.</p>
-      </div>
-      <div>
-        <h3>When Fader quits</h3>
-        <p>macOS destroys its taps and every app's audio returns to normal immediately. Details in <a href="https://github.com/Lokasta/fader/blob/main/SECURITY.md">SECURITY.md</a>.</p>
-      </div>
+      <p class="quit-note"><svg viewBox="0 0 24 24"><path d="M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><strong>If Fader quits,</strong> macOS destroys its taps and every app's audio is back to normal instantly. Details in <a href="https://github.com/Lokasta/fader/blob/main/SECURITY.md">SECURITY.md</a>.</span></p>
     </div>
   </div>
 </section>
@@ -910,24 +1014,57 @@ footer nav a:hover { color: var(--text); }
     <p class="label"><b>05</b> Install</p>
     <h2 id="install-title">Up and running in a minute.</h2>
 
-    <ol class="install-steps">
-      <li>
+    <div class="bento steps4">
+      <article class="tile">
+        <div class="viz viz-dl" aria-hidden="true">
+          <div class="dl">
+            <span class="dl-file"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3" fill="#d9d6e8"/><rect x="4" y="5" width="16" height="4" rx="2" fill="#b4afcc"/><path d="M12 10v6M9.5 13.5 12 16l2.5-2.5" fill="none" stroke="#5b56a0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="dl-body"><b>LokastasFader.dmg</b><span class="dl-bar"><i></i></span><small>1 MB &#183; Notarized by Apple</small></span>
+          </div>
+        </div>
+        <span class="step-n">01</span>
         <h3>Download the .dmg</h3>
         <p>Grab the latest release. It's signed and notarized by Apple.</p>
-      </li>
-      <li>
+      </article>
+      <article class="tile">
+        <div class="viz viz-dmg" aria-hidden="true">
+          <div class="dmg">
+            <div class="win-bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="win-title">Lokasta's Fader</span></div>
+            <div class="dmg-body">
+              <span class="dmg-item"><img src="assets/icon.png" alt="" width="40" height="40"><small>Fader</small></span>
+              <span class="dmg-arrow"><svg viewBox="0 0 60 20"><path d="M2 10h50M44 4l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round"/></svg></span>
+              <span class="dmg-item"><svg class="folder" viewBox="0 0 48 40"><path d="M2 8a4 4 0 0 1 4-4h12l4 5h20a4 4 0 0 1 4 4v21a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z" fill="#3d9bf0"/><path d="M2 14h44v20a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z" fill="#5fb2f7"/><path d="M17 30l7-13 7 13M19.5 25.5h9" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><small>Applications</small></span>
+            </div>
+          </div>
+        </div>
+        <span class="step-n">02</span>
         <h3>Drag to Applications</h3>
-        <p>Open the disk image and drag Fader into your Applications folder, then launch it.</p>
-      </li>
-      <li>
+        <p>Open the disk image, drag Fader into Applications, then launch it.</p>
+      </article>
+      <article class="tile">
+        <div class="viz viz-alert" aria-hidden="true">
+          <div class="alert">
+            <img src="assets/icon.png" alt="" width="34" height="34">
+            <b>"Lokasta's Fader" would like to access system audio.</b>
+            <span class="alert-btns"><span>Don't Allow</span><span class="primary">Allow</span></span>
+          </div>
+        </div>
+        <span class="step-n">03</span>
         <h3>Allow System Audio Recording</h3>
         <p>macOS asks once. That's how Fader reads each app's audio. Nothing is recorded.</p>
-      </li>
-      <li>
-        <h3>Add to Control Center <span class="opt-tag">Optional</span></h3>
-        <p>On macOS 26: Control Center, Edit Controls, search "Fader", and drag it in (or to the menu bar).</p>
-      </li>
-    </ol>
+      </article>
+      <article class="tile">
+        <div class="viz viz-cc" aria-hidden="true">
+          <div class="ccg">
+            <span class="ccb"></span><span class="ccb"></span><span class="ccb"></span>
+            <span class="ccb"></span><span class="ccb fader"><svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><i>+</i></span><span class="ccb"></span>
+          </div>
+        </div>
+        <span class="step-n">04 &#183; optional</span>
+        <h3>Add to Control Center</h3>
+        <p>On macOS 26: Control Center, Edit Controls, search "Fader", drag it in (or to the menu bar).</p>
+      </article>
+    </div>
 
     <div class="install-cta">
       <a class="btn btn-primary" href="https://github.com/Lokasta/fader/releases/latest/download/LokastasFader.dmg">
@@ -962,11 +1099,33 @@ git clone https://github.com/Lokasta/fader &amp;&amp; cd fader
           <a class="btn btn-ghost" href="https://github.com/Lokasta/fader/blob/main/AGENTS.md">Read AGENTS.md</a>
         </div>
       </div>
-      <div class="prompt" aria-label="Example prompts">
-        <div class="dim"># clone the repo, then:</div>
-        <div><span class="u">&gt;</span> build and install Fader</div>
-        <div><span class="u">&gt;</span> add a keyboard shortcut to mute Spotify</div>
+      <div class="term" aria-label="Example: asking a coding agent to build Fader">
+        <div class="win-bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="win-title">~/fader</span></div>
+        <div class="term-body">
+          <div><span class="ps">$</span> gh repo clone Lokasta/fader &amp;&amp; cd fader</div>
+          <div><span class="ps">$</span> claude</div>
+          <div class="ask"><span class="u">&gt;</span> build and install Fader</div>
+          <div class="out"><span class="dot"></span>Read AGENTS.md</div>
+          <div class="out"><span class="dot"></span>xcodegen generate, 15 tests passed</div>
+          <div class="out ok"><span class="dot"></span>Installed /Applications/Fader.app</div>
+          <div class="ask"><span class="u">&gt;</span> add a shortcut to mute Spotify<span class="caret"></span></div>
+        </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="finale" aria-labelledby="finale-title">
+  <div class="wrap">
+    <img src="assets/icon.png" alt="" width="88" height="88">
+    <h2 id="finale-title">Turn it down. <span class="grad">Just that app.</span></h2>
+    <p class="lede">Free, open source, and about a megabyte.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/Lokasta/fader/releases/latest/download/LokastasFader.dmg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download for Mac
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/Lokasta/fader">Star on GitHub</a>
     </div>
   </div>
 </section>
