@@ -7,6 +7,9 @@ struct AudioProcess {
     let objectID: AudioObjectID
     let pid: pid_t
     let isPlaying: Bool
+    /// Core Audio's own identifier for the client. Readable even for root daemons,
+    /// where `proc_name` is refused.
+    let bundleID: String?
 }
 
 /// The app a user thinks of as "the thing making sound": helpers are folded into their owner,
@@ -34,11 +37,23 @@ enum AudioProcesses {
         return ids.compactMap { id in
             guard let pid: pid_t = try? id.read(kAudioProcessPropertyPID, default: pid_t(-1)), pid > 0, pid != ownPID else { return nil }
             let running: UInt32 = (try? id.read(kAudioProcessPropertyIsRunningOutput, default: UInt32(0))) ?? 0
-            return AudioProcess(objectID: id, pid: pid, isPlaying: running != 0)
+            return AudioProcess(objectID: id, pid: pid, isPlaying: running != 0, bundleID: try? id.readString(kAudioProcessPropertyBundleID))
         }
     }
 
-    static func identity(for pid: pid_t) -> AudioAppIdentity {
+    /// macOS services that play sound on their own, shown with a name a person recognizes.
+    private static let systemServices: [String: (name: String, symbol: String)] = [
+        "systemsoundserverd": ("Sons do sistema", "bell.fill"),
+        "com.apple.systemsoundserverd": ("Sons do sistema", "bell.fill"),
+        "com.apple.SpeechSynthesisServerXPC": ("Fala do sistema", "waveform"),
+        "com.apple.speech.speechsynthesisd": ("Fala do sistema", "waveform"),
+        "com.apple.accessibility.heard": ("Acessibilidade", "accessibility"),
+        "com.apple.CoreSpeech": ("Siri", "mic.fill"),
+        "com.apple.assistantd": ("Siri", "mic.fill"),
+    ]
+
+    static func identity(for process: AudioProcess) -> AudioAppIdentity {
+        let pid = process.pid
         let ownerPID = responsiblePID?(pid) ?? pid
         for candidate in [ownerPID, pid] where candidate > 0 {
             if let app = NSRunningApplication(processIdentifier: candidate), let name = app.localizedName {
@@ -47,8 +62,27 @@ enum AudioProcesses {
                 return AudioAppIdentity(key: key, name: name, bundleID: app.bundleIdentifier, icon: icon)
             }
         }
-        let name = processName(ownerPID) ?? processName(pid) ?? "Processo \(pid)"
-        return AudioAppIdentity(key: "name:\(name)", name: name, bundleID: nil, icon: NSWorkspace.shared.icon(for: .unixExecutable))
+        if let bundleID = process.bundleID, let service = systemServices[bundleID] {
+            return AudioAppIdentity(key: "service:\(service.name)", name: service.name, bundleID: bundleID, icon: symbolIcon(service.symbol))
+        }
+        let fallbackName = process.bundleID.flatMap { $0.split(separator: ".").last.map(String.init) }
+        let name = processName(ownerPID) ?? processName(pid) ?? fallbackName ?? "Processo \(pid)"
+        return AudioAppIdentity(key: "name:\(name)", name: name, bundleID: process.bundleID, icon: NSWorkspace.shared.icon(for: .unixExecutable))
+    }
+
+    /// An SF Symbol on a rounded tile, so system services sit nicely next to real app icons.
+    private static func symbolIcon(_ symbol: String) -> NSImage {
+        let size = NSSize(width: 64, height: 64)
+        return NSImage(size: size, flipped: false) { rect in
+            let tile = NSBezierPath(roundedRect: rect.insetBy(dx: 4, dy: 4), xRadius: 14, yRadius: 14)
+            NSGradient(colors: [NSColor.systemGray, NSColor.darkGray])?.draw(in: tile, angle: -90)
+            let config = NSImage.SymbolConfiguration(pointSize: 28, weight: .semibold).applying(.init(paletteColors: [.white]))
+            if let glyph = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?.withSymbolConfiguration(config) {
+                let origin = NSPoint(x: rect.midX - glyph.size.width / 2, y: rect.midY - glyph.size.height / 2)
+                glyph.draw(at: origin, from: .zero, operation: .sourceOver, fraction: 1)
+            }
+            return true
+        }
     }
 
     private static func processName(_ pid: pid_t) -> String? {

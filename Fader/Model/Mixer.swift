@@ -24,6 +24,8 @@ struct AppEntry: Identifiable, Equatable {
 @MainActor
 final class Mixer: ObservableObject {
     static let maxVolume: Float = 2
+    /// A `--snapshot` run is a second copy of the app: it must never tap audio.
+    static let touchesAudio = Snapshot.requestedPath == nil
 
     @Published private(set) var apps: [AppEntry] = []
     @Published private(set) var output = DeviceState(direction: .output)
@@ -188,7 +190,7 @@ final class Mixer: ObservableObject {
 
         var groups: [String: (identity: AudioAppIdentity, processes: [AudioProcess])] = [:]
         for process in processes {
-            let identity = identities[process.pid] ?? AudioProcesses.identity(for: process.pid)
+            let identity = identities[process.pid] ?? AudioProcesses.identity(for: process)
             identities[process.pid] = identity
             groups[identity.key, default: (identity, [])].processes.append(process)
         }
@@ -220,6 +222,7 @@ final class Mixer: ObservableObject {
         }
         next.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         if next != apps { apps = next }
+        updateMeterHub()
     }
 
     private func refreshDevices(_ direction: AudioDirection) {
@@ -234,51 +237,53 @@ final class Mixer: ObservableObject {
         }
     }
 
-    /// Decides which tap an app gets:
-    /// - **mixing** (mutes the original, replays at our gain) whenever it isn't at 100%, and kept
-    ///   while it plays even back at 100% (tearing it down mid-song would glitch);
-    /// - **meter-only** (audio untouched) while the panel is open, so 100% apps still show a level;
-    /// - **none** otherwise: untouched apps run through macOS exactly as before.
+    /// A mixing tap (mutes the original, replays at our gain) exists whenever an app isn't at 100%,
+    /// and is kept while it plays even back at 100% (tearing it down mid-song would glitch).
+    /// Apps without one run through macOS untouched; their meters come from `MeterHub`.
     private func reconcileTap(_ entry: inout AppEntry) {
         let gain = entry.effectiveGain
         let needsMix = abs(gain - 1) > 0.001
-        let wantsMeter = isMetering && entry.isPlaying
-        let existing = taps[entry.id]
 
-        if let tap = existing, tap.outputDeviceID == currentOutput {
-            let useful = tap.isMeterOnly ? (!needsMix && wantsMeter) : (needsMix || entry.isPlaying)
-            if useful && (tap.processes == entry.processes || tap.update(processes: entry.processes)) {
-                if !tap.isMeterOnly { tap.gain = gain }
+        if let tap = taps[entry.id] {
+            if tap.outputDeviceID == currentOutput && (needsMix || entry.isPlaying)
+                && (tap.processes == entry.processes || tap.update(processes: entry.processes)) {
+                tap.gain = gain
                 return
             }
+            taps.removeValue(forKey: entry.id)?.invalidate()
         }
 
-        // Build the replacement before dropping the old tap so the app's audio never gaps.
-        var replacement: AppTap?
-        if needsMix || wantsMeter, permission == .authorized, currentOutput.isValid {
-            let attempt = "\(entry.processes)-\(currentOutput)-\(needsMix)"
-            if failedAttempts[entry.id] != attempt {
-                do {
-                    replacement = try AppTap(processes: entry.processes, outputDevice: currentOutput, name: entry.name, gain: gain, meterOnly: !needsMix)
-                    let name = entry.name, kind = needsMix ? "mixing" : "metering"
-                    log.info("\(kind, privacy: .public) tap for \(name, privacy: .public) at \(gain, privacy: .public)")
-                    entry.failure = nil
-                    failedAttempts[entry.id] = nil
-                } catch {
-                    let id = entry.id
-                    log.error("tap for \(id, privacy: .public) failed: \(String(describing: error), privacy: .public)")
-                    if needsMix { entry.failure = "Não consegui controlar esse app" }
-                    failedAttempts[entry.id] = attempt
-                }
-            }
+        guard needsMix, Self.touchesAudio, permission == .authorized, currentOutput.isValid else { return }
+        let attempt = "\(entry.processes)-\(currentOutput)"
+        guard failedAttempts[entry.id] != attempt else { return }
+
+        do {
+            taps[entry.id] = try AppTap(processes: entry.processes, outputDevice: currentOutput, name: entry.name, gain: gain)
+            let name = entry.name
+            log.info("mixing tap for \(name, privacy: .public) at \(gain, privacy: .public)")
+            entry.failure = nil
+            failedAttempts[entry.id] = nil
+        } catch {
+            let id = entry.id
+            log.error("tap for \(id, privacy: .public) failed: \(String(describing: error), privacy: .public)")
+            entry.failure = "Não consegui controlar esse app"
+            failedAttempts[entry.id] = attempt
         }
-        existing?.invalidate()
-        taps[entry.id] = replacement
+    }
+
+    /// Meters for playing apps that have no mixing tap, all through one shared aggregate.
+    private func updateMeterHub() {
+        guard isMetering, Self.touchesAudio, permission == .authorized else { return meterHub.update([], outputDevice: .unknown) }
+        let sources = apps
+            .filter { $0.isPlaying && taps[$0.id] == nil }
+            .map { MeterHub.Source(key: $0.id, processes: $0.processes) }
+        meterHub.update(sources, outputDevice: currentOutput)
     }
 
     // MARK: - Level meters
 
     let levels = LevelMeters()
+    private let meterHub = MeterHub()
     private let micMeter = MicMeter()
     private var meteringViewers = 0
     private var meterTimer: Timer?
@@ -301,6 +306,7 @@ final class Mixer: ObservableObject {
         meterTimer?.invalidate()
         meterTimer = nil
         micMeter.stop()
+        meterHub.stop()
         levels.reset()
         refresh()
     }
@@ -312,7 +318,7 @@ final class Mixer: ObservableObject {
     }
 
     private func pollLevels() {
-        var peaks: [String: Float] = [:]
+        var peaks = meterHub.takePeaks()
         for (key, tap) in taps { peaks[key] = tap.takePeak() }
         levels.update(apps: peaks, mic: micMeter.takePeak())
         if micMeter.availability == .noPermission { updateMicMeter() }
@@ -339,6 +345,7 @@ final class Mixer: ObservableObject {
         timer?.invalidate()
         meterTimer?.invalidate()
         micMeter.stop()
+        meterHub.stop()
         for tap in taps.values { tap.invalidate() }
         taps.removeAll()
     }

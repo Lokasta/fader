@@ -11,8 +11,6 @@ import os
 final class AppTap {
     private(set) var processes: [AudioObjectID]
     let outputDeviceID: AudioObjectID
-    /// Metering taps leave the app's audio untouched (not muted, nothing re-rendered).
-    let isMeterOnly: Bool
 
     private var tapID = AudioObjectID.unknown
     private var aggregateID = AudioObjectID.unknown
@@ -27,10 +25,9 @@ final class AppTap {
         set { context.targetGain = max(0, newValue) }
     }
 
-    init(processes: [AudioObjectID], outputDevice: AudioObjectID, name: String, gain: Float, meterOnly: Bool = false) throws {
+    init(processes: [AudioObjectID], outputDevice: AudioObjectID, name: String, gain: Float) throws {
         self.processes = processes
         self.outputDeviceID = outputDevice
-        self.isMeterOnly = meterOnly
 
         guard let outputUID = AudioDevices.uid(of: outputDevice) else {
             throw CoreAudioError(status: kAudioHardwareBadDeviceError, context: "saída sem UID")
@@ -40,8 +37,7 @@ final class AppTap {
         context = RenderContext(
             inputBufferOffset: AudioDevices.streamCount(of: outputDevice, scope: kAudioObjectPropertyScopeInput),
             leftChannel: stereo.left,
-            rightChannel: stereo.right,
-            passesAudio: !meterOnly
+            rightChannel: stereo.right
         )
         context.targetGain = gain
 
@@ -59,7 +55,7 @@ final class AppTap {
         let description = CATapDescription(stereoMixdownOfProcesses: processes)
         description.uuid = UUID()
         description.name = "Fader (\(name))"
-        description.muteBehavior = isMeterOnly ? .unmuted : .mutedWhenTapped
+        description.muteBehavior = .mutedWhenTapped
         description.isPrivate = true
 
         try check(AudioHardwareCreateProcessTap(description, &tapID), "criar tap")
@@ -94,23 +90,9 @@ final class AppTap {
     private func disableDeviceInputs() {
         guard let ioProcID else { return }
         let total = AudioDevices.streamCount(of: aggregateID, scope: kAudioObjectPropertyScopeInput)
-        let deviceInputs = context.inputBufferOffset
-        guard total > 0, deviceInputs > 0 else { return }
-
-        let flagsOffset = MemoryLayout<AudioHardwareIOProcStreamUsage>.offset(of: \.mStreamIsOn)!
-        let byteCount = flagsOffset + MemoryLayout<UInt32>.stride * total
-        let raw = UnsafeMutableRawPointer.allocate(byteCount: max(byteCount, MemoryLayout<AudioHardwareIOProcStreamUsage>.size), alignment: 8)
-        defer { raw.deallocate() }
-
-        let usage = raw.assumingMemoryBound(to: AudioHardwareIOProcStreamUsage.self)
-        usage.pointee.mIOProc = unsafeBitCast(ioProcID, to: UnsafeMutableRawPointer.self)
-        usage.pointee.mNumberStreams = UInt32(total)
-        let flags = (raw + flagsOffset).assumingMemoryBound(to: UInt32.self)
-        for index in 0..<total { flags[index] = index < deviceInputs ? 0 : 1 }
-
-        var address = propertyAddress(kAudioDevicePropertyIOProcStreamUsage, scope: kAudioObjectPropertyScopeInput)
-        let status = AudioObjectSetPropertyData(aggregateID, &address, 0, nil, UInt32(byteCount), raw)
-        if status != noErr { Self.log.warning("stream usage not applied: \(status)") }
+        guard context.inputBufferOffset > 0 else { return }
+        setStreamUsage(device: aggregateID, procID: ioProcID, scope: kAudioObjectPropertyScopeInput,
+                       enabled: (0..<total).map { $0 >= context.inputBufferOffset })
     }
 
     func takePeak() -> Float { context.takePeak() }

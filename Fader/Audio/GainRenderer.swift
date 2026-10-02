@@ -13,14 +13,10 @@ final class RenderContext: @unchecked Sendable {
     let inputBufferOffset: Int
     let leftChannel: Int
     let rightChannel: Int
-    /// False for metering taps: the app's audio still plays normally, we only measure it.
-    let passesAudio: Bool
-
-    init(inputBufferOffset: Int, leftChannel: Int, rightChannel: Int, passesAudio: Bool = true) {
+    init(inputBufferOffset: Int, leftChannel: Int, rightChannel: Int) {
         self.inputBufferOffset = inputBufferOffset
         self.leftChannel = leftChannel
         self.rightChannel = rightChannel
-        self.passesAudio = passesAudio
     }
 
     var targetGain: Float {
@@ -35,15 +31,8 @@ final class RenderContext: @unchecked Sendable {
         let target = targetGain
         let inputList = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: input))
         let outputList = UnsafeMutableAudioBufferListPointer(output)
-        let heard = passesAudio ? max(currentGain, target) : 1
-        peak.raise(to: GainRenderer.peak(of: inputList, firstBuffer: inputBufferOffset) * heard)
+        peak.raise(to: GainRenderer.peak(of: inputList, firstBuffer: inputBufferOffset) * max(currentGain, target))
 
-        guard passesAudio else {
-            for buffer in outputList {
-                if let data = buffer.mData { memset(data, 0, Int(buffer.mDataByteSize)) }
-            }
-            return
-        }
         GainRenderer.render(
             input: inputList,
             inputBufferOffset: inputBufferOffset,
@@ -91,10 +80,10 @@ enum GainRenderer {
         return total
     }
 
-    static func peak(of list: UnsafeMutableAudioBufferListPointer, firstBuffer: Int) -> Float {
+    static func peak(of list: UnsafeMutableAudioBufferListPointer, firstBuffer: Int, count: Int = .max) -> Float {
         guard firstBuffer < list.count else { return 0 }
         var peak: Float = 0
-        for bufferIndex in firstBuffer..<list.count {
+        for bufferIndex in firstBuffer..<min(list.count, firstBuffer &+ count) {
             let buffer = list[bufferIndex]
             guard let data = buffer.mData else { continue }
             let samples = data.assumingMemoryBound(to: Float.self)

@@ -11,7 +11,7 @@ Menu bar app (macOS 15+, Swift/SwiftUI) for per-app volume using Core Audio Proc
 - `Fader/Audio/AudioProcesses.swift`: Core Audio process list and app attribution via `responsibility_get_pid_responsible_for_pid` (dlsym).
 - `Fader/Audio/AudioCapturePermission.swift`: TCC preflight/request for `kTCCServiceAudioCapture` (private TCC framework, dlopen).
 - `Fader/Model/Mixer.swift`: `@MainActor` model. 1 s refresh loop plus Core Audio listeners; `reconcileTap` decides when taps exist. `DeviceState` covers output and microphone.
-- `Fader/Audio/MicMeter.swift`: mic level IO proc + `PeakBox` (lock-free peak shared with audio threads). `Fader/Model/LevelMeters.swift`: dB normalization and smoothing. `Fader/UI/LevelBar.swift`: meter bar + `WindowVisibility`.
+- `Fader/Audio/MeterHub.swift`: shared metering aggregate + `setStreamUsage` helper. `Fader/Audio/MicMeter.swift`: mic level IO proc + `PeakBox` (lock-free peak shared with audio threads). `Fader/Model/LevelMeters.swift`: dB normalization and smoothing. `Fader/UI/LevelBar.swift`: meter bar + `WindowVisibility`.
 - `Fader/Model/VolumeStore.swift`: per-bundle-ID volume/mute in UserDefaults.
 - `Fader/UI/`: SwiftUI views. `Snapshot.swift` implements `--snapshot <png>`. `FloatingPanel.swift` is the Control Center-style panel opened by `fader://panel`.
 - `FaderControls/`: WidgetKit extension (macOS 26+) with one `ControlWidgetButton` that opens `fader://panel` via `OpenURLIntent`. Must stay sandboxed; the entitlement is declared in `project.yml` because XcodeGen rewrites the `.entitlements` file.
@@ -22,7 +22,7 @@ Menu bar app (macOS 15+, Swift/SwiftUI) for per-app volume using Core Audio Proc
 ## Rules
 
 - The microphone is opened only by `MicMeter`, only while a panel is visible (`WindowVisibility` → `beginMetering`/`endMetering`), and never on Bluetooth inputs. Nothing else may open an input stream.
-- Meter taps are `isMeterOnly` (unmuted, output zeroed) and exist only while metering. `LevelMeters` is a separate ObservableObject so 30 Hz updates don't invalidate `Mixer`.
+- Meters for unmixed apps go through `MeterHub` (one aggregate with all unmuted meter taps, one IO proc), only while metering. Never go back to one aggregate per meter: 20 apps cost ~23% CPU that way. `LevelMeters` is a separate ObservableObject so 30 Hz updates don't invalidate `Mixer`.
 - Never create a tap without audio capture permission: a tap without permission mutes the app and delivers silence.
 - Apps at exactly 100% and not muted must not be tapped (a tap is kept only while still playing, to avoid a glitch).
 - `FloatingPanel` owns its frame (`sizingOptions = []`) and refits on model changes, debounced. Resizing from a window resize notification caused an AppKit layout-loop crash.

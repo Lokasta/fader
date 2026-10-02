@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-02 -- 1.5.0
+
+**Performance / Fix**: stress-tested with 20 apps playing at once.
+
+- New `MeterHub`: meters for every unmixed app share ONE aggregate device and IO proc instead of one per app. With 20 apps and the panel open, Fader went from ~23% to ~5% CPU (one HAL IO thread instead of 20). Rebuilding it is silent because meter taps never change the audio.
+- `AppTap` is mixing-only again; `setStreamUsage` is shared by both.
+- The app list caps at ~440 pt and scrolls (verified with 20 apps).
+- macOS services get readable names via Core Audio's process bundle ID (`proc_name` is refused for root daemons): `systemsoundserverd` now shows as "Sons do sistema" instead of "Processo 40304".
+- `--snapshot` runs never create taps (`Mixer.touchesAudio`).
+
 ## 2026-10-02 -- 1.4.0
 
 **Feature**: live level meters.
