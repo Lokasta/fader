@@ -68,6 +68,12 @@ enum AudioProcesses {
         "com.apple.assistantd": ("Siri", "mic.fill"),
     ]
 
+    /// Audio helpers that launchd starts on behalf of an app, so responsibility doesn't point back to it.
+    private static let helperOwners: [(prefix: String, ownerBundleID: String)] = [
+        ("SimulatorTrampoline", "com.apple.iphonesimulator"),
+        ("com.apple.CoreSimulator", "com.apple.iphonesimulator"),
+    ]
+
     static func identity(for process: AudioProcess) -> AudioAppIdentity {
         let pid = process.pid
         let ownerPID = responsiblePID?(pid) ?? pid
@@ -77,6 +83,12 @@ enum AudioProcesses {
                 let key = app.bundleIdentifier ?? "pid:\(candidate)"
                 return AudioAppIdentity(key: key, name: name, bundleID: app.bundleIdentifier, icon: icon)
             }
+        }
+        if let bundleID = process.bundleID,
+           let owner = helperOwners.first(where: { bundleID.hasPrefix($0.prefix) }),
+           let app = NSRunningApplication.runningApplications(withBundleIdentifier: owner.ownerBundleID).first,
+           let name = app.localizedName {
+            return AudioAppIdentity(key: owner.ownerBundleID, name: name, bundleID: owner.ownerBundleID, icon: app.icon ?? NSWorkspace.shared.icon(for: .application))
         }
         if let bundleID = process.bundleID, let service = systemServices[bundleID] {
             return AudioAppIdentity(key: "service:\(service.name)", name: service.name, bundleID: bundleID, icon: symbolIcon(service.symbol))
