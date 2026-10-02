@@ -37,7 +37,14 @@ rm -f "$DMG"
 hdiutil create -volname "Lokasta's Fader" -srcfolder "$STAGE" -format UDZO -quiet "$DMG"
 codesign --sign "Developer ID Application" --timestamp "$DMG"
 
-xcrun notarytool submit "$DMG" --keychain-profile "$PROFILE" --wait
+# notarytool exits 0 even when Apple rejects the upload, so check the status it reports.
+RESULT=$(xcrun notarytool submit "$DMG" --keychain-profile "$PROFILE" --wait 2>&1)
+echo "$RESULT"
+if [[ "$RESULT" != *"status: Accepted"* ]]; then
+    ID=$(echo "$RESULT" | awk '/^  id:/ {print $2; exit}')
+    echo "Notarization failed. Details: xcrun notarytool log $ID --keychain-profile $PROFILE" >&2
+    exit 1
+fi
 xcrun stapler staple "$DMG"
 spctl --assess --type open --context context:primary-signature -v "$DMG"
 
