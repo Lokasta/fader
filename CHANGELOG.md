@@ -5,6 +5,8 @@
 **Website**
 
 - The hero screenshot is now an interactive HTML copy of the panel: draggable sliders with the 100% detent, mute buttons, and live meters shaped per app (music, call, game, video). With reduced motion the meters hold steady levels that still follow volume and mute.
+- "Why" section compares a faithful Control Center (Sound module highlighted) with a compact Fader panel, instead of abstract sliders.
+- Features are a bento grid where each tile shows its feature: the 0-200% sweep, live meters, the device menu, keycaps, the idle CPU number, restored volumes, helper-to-app names and "0 network requests".
 - `--snapshot` renders at 3x; the README screenshot is sharp on Retina screens. The social card uses a 3x render of the interactive panel.
 
 ## 2026-10-02 -- 1.6.1
