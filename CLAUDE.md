@@ -14,6 +14,7 @@ Menu bar app (macOS 15+, Swift/SwiftUI) for per-app volume using Core Audio Proc
 - `Fader/Model/VolumeStore.swift`: per-bundle-ID volume/mute in UserDefaults.
 - `Fader/UI/`: SwiftUI views. `Snapshot.swift` implements `--snapshot <png>`. `FloatingPanel.swift` is the Control Center-style panel opened by `fader://panel`.
 - `FaderControls/`: WidgetKit extension (macOS 26+) with one `ControlWidgetButton` that opens `fader://panel` via `OpenURLIntent`. Must stay sandboxed; the entitlement is declared in `project.yml` because XcodeGen rewrites the `.entitlements` file.
+- `Fader/UI/GlobalHotKey.swift`: ⌃⌥V via Carbon `RegisterEventHotKey`. Reopening the app (`applicationShouldHandleReopen`) also shows the panel.
 - `fader://` URLs are handled with a raw Apple Event handler in `AppDelegate` (SwiftUI swallows them otherwise).
 - `scripts/install.sh`: Release build, install to /Applications, relaunch. `scripts/make-icon.swift`: draws the app icon.
 
@@ -23,6 +24,7 @@ Menu bar app (macOS 15+, Swift/SwiftUI) for per-app volume using Core Audio Proc
 - Never create a tap without audio capture permission: a tap without permission mutes the app and delivers silence.
 - Apps at exactly 100% and not muted must not be tapped (a tap is kept only while still playing, to avoid a glitch).
 - `FloatingPanel` owns its frame (`sizingOptions = []`) and refits on model changes, debounced. Resizing from a window resize notification caused an AppKit layout-loop crash.
+- The panel ignores losing key focus for 1.5 s after showing (the launcher steals focus back); outside clicks close it via a global mouse monitor.
 - Keep the IO block allocation-free. Don't iterate array literals or log there.
 - Swift language mode 5 (see project.yml). Signing: Developer ID Application, team N45547YJ4V.
 - The shell's `log` is a zsh builtin: use `/usr/bin/log show --predicate 'subsystem == "com.lokasta.fader"' --info`.

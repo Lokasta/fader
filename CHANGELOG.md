@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-02 -- 1.2.0
+
+**Feature**: more ways to open the panel when the menu bar is crowded.
+
+- Global shortcut ⌃⌥V toggles the panel from any app (Carbon hot key, no Accessibility permission).
+- Opening Fader again (Spotlight, Finder) shows the panel.
+- **Fix**: the panel no longer closes right after opening when the launching app (Spotlight, a terminal) takes focus back.
+
 ## 2026-10-02 -- 1.1.0
 
 **Feature**: Control Center control.

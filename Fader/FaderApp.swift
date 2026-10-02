@@ -28,6 +28,7 @@ struct FaderApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor static var mixer: Mixer?
     @MainActor private lazy var panel: FloatingPanel? = Self.mixer.map(FloatingPanel.init)
+    private var hotKey: GlobalHotKey?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         NSAppleEventManager.shared().setEventHandler(
@@ -36,6 +37,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             forEventClass: AEEventClass(kInternetEventClass),
             andEventID: AEEventID(kAEGetURL)
         )
+    }
+
+    @MainActor
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        hotKey = GlobalHotKey { [weak self] in
+            MainActor.assumeIsolated { self?.panel?.toggle() }
+        }
+    }
+
+    /// Opening Fader again (Spotlight, Finder, Dock) shows the panel: the reliable way in
+    /// when a crowded menu bar hides the icon behind the notch.
+    @MainActor
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        panel?.show()
+        return false
     }
 
     @MainActor @objc

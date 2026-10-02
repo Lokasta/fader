@@ -59,4 +59,9 @@ build/Build/Products/Debug/Fader.app/Contents/MacOS/Fader --snapshot painel.png
 /usr/bin/log show --last 5m --predicate 'subsystem == "com.lokasta.fader"' --info
 ```
 
-O ícone pode ficar escondido se você usa Hidden Bar, Ice ou Bartender: segure ⌘ e arraste ele para a área visível.
+## Abrindo o painel
+
+- Ícone na barra de menu (ao lado do Som), controle da Central de Controle, atalho **⌃⌥V** de qualquer app, ou abrir o Fader de novo pelo Spotlight.
+- Barra lotada (notch) esconde ícones sem aviso. Para fixar o Fader perto do relógio:
+  `pkill -x Fader; defaults write com.lokasta.fader "NSStatusItem Preferred Position Item-0" -float 330; open -a Fader`
+  (o número é a distância da borda direita; o Som da Apple fica por volta de 320).

@@ -10,6 +10,7 @@ final class FloatingPanel {
     private var panel: NSPanel?
     private var outsideClickMonitor: Any?
     private var contentChanges: AnyCancellable?
+    private var shownAt = Date.distantPast
     private let mixer: Mixer
     private let log = Logger(subsystem: "com.lokasta.fader", category: "panel")
 
@@ -29,6 +30,7 @@ final class FloatingPanel {
         panel.contentView?.layoutSubtreeIfNeeded()
         anchorToTopRight(panel)
 
+        shownAt = Date()
         NSApp.activate()
         panel.makeKeyAndOrderFront(nil)
         log.info("panel shown at \(String(describing: panel.frame), privacy: .public) key=\(panel.isKeyWindow)")
@@ -86,8 +88,18 @@ final class FloatingPanel {
                     self.anchorToTopRight(panel)
                 }
             }
-        NotificationCenter.default.addObserver(forName: NSWindow.didResignKeyNotification, object: panel, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.close() }
+        // Whoever launched us (Spotlight, a terminal) grabs focus back right after opening.
+        // That isn't the user leaving, so reclaim focus; real outside clicks still close.
+        NotificationCenter.default.addObserver(forName: NSWindow.didResignKeyNotification, object: panel, queue: .main) { [weak self, weak panel] _ in
+            MainActor.assumeIsolated {
+                guard let self, let panel, panel.isVisible else { return }
+                if Date().timeIntervalSince(self.shownAt) < 1.5 {
+                    NSApp.activate()
+                    panel.makeKeyAndOrderFront(nil)
+                } else {
+                    self.close()
+                }
+            }
         }
         return panel
     }
