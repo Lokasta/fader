@@ -15,29 +15,15 @@
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
-	<string>APPL</string>
+	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.lokasta.fader</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fader</string>
-			</array>
-		</dict>
-	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.utilities</string>
-	<key>LSUIElement</key>
-	<true/>
-	<key>NSAudioCaptureUsageDescription</key>
-	<string>O Fader precisa acessar o áudio de cada app para controlar o volume dele individualmente. Nada é gravado nem sai do seu Mac.</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Lokasta</string>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.widgetkit-extension</string>
+	</dict>
 </dict>
 </plist>

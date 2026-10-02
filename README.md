@@ -11,7 +11,15 @@ Volume por app no macOS, direto da barra de menu. Sem driver, sem BlackHole, sem
 - **Lembra o volume** de cada app e reaplica sozinho quando ele volta a tocar.
 - **Saída e microfone**: troca o dispositivo padrão e ajusta o volume de cada um (o mesmo que Ajustes > Som faz).
 - Agrupa processos auxiliares no app certo: o áudio do Chrome, do Safari (WebKit) ou de um `afplay` no terminal aparece com o nome e o ícone do app dono.
+- **Controle na Central de Controle** (macOS 26+): um botão "Fader" que abre o painel no canto da tela, igual à Central de Controle. Também pode ir direto pra barra de menu.
 - Abre ao iniciar o Mac (dá pra desligar na engrenagem).
+
+## Central de Controle
+
+1. Abra a Central de Controle e clique em **Editar Controles**.
+2. Busque **Fader** e arraste o controle pra Central de Controle ou pra barra de menu.
+
+A Apple só permite **botões e liga/desliga** em controles de terceiros (o slider de Som é exclusivo do sistema), então o controle do Fader abre o painel completo com um clique. Por baixo ele chama `fader://panel`, que também funciona em atalhos, Raycast etc.
 
 ## Como funciona
 

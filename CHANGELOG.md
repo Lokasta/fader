@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-02 -- 1.1.0
+
+**Feature**: Control Center control.
+
+- New `FaderControls` WidgetKit extension: a "Fader" button for Control Center or the menu bar (macOS 26+). Third-party controls can't host sliders, so it opens the full panel.
+- Floating Control Center-style panel anchored to the top-right of the active screen, opened by `fader://panel`; closes on outside click or Esc.
+- **Fix**: panel crash from an AppKit layout loop (window resize feeding back into SwiftUI sizing).
+
 ## 2026-10-02 -- 1.0.0
 
 **Feature**: first version.
