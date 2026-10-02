@@ -31,6 +31,7 @@ final class Mixer: ObservableObject {
     @Published private(set) var permission = AudioCapturePermission.status
     @Published private(set) var launchAtLogin = SMAppService.mainApp.status == .enabled
     @Published private(set) var rememberVolumes: Bool
+    @Published private(set) var dictationKeyOpensPanel: Bool
 
     private let store = VolumeStore()
     private var taps: [String: AppTap] = [:]
@@ -46,6 +47,9 @@ final class Mixer: ObservableObject {
 
     init() {
         rememberVolumes = store.remembers
+        UserDefaults.standard.register(defaults: [Self.dictationKeyDefault: true])
+        dictationKeyOpensPanel = UserDefaults.standard.bool(forKey: Self.dictationKeyDefault)
+        DictationKeyRemap.apply(dictationKeyOpensPanel)
         refresh()
         observeCoreAudio()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -137,6 +141,14 @@ final class Mixer: ObservableObject {
             log.error("launch at login: \(String(describing: error))")
         }
         launchAtLogin = SMAppService.mainApp.status == .enabled
+    }
+
+    private static let dictationKeyDefault = "dictationKeyOpensPanel"
+
+    func setDictationKeyOpensPanel(_ enabled: Bool) {
+        UserDefaults.standard.set(enabled, forKey: Self.dictationKeyDefault)
+        dictationKeyOpensPanel = enabled
+        DictationKeyRemap.apply(enabled)
     }
 
     func setRememberVolumes(_ enabled: Bool) {

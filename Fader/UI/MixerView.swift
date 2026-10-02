@@ -182,6 +182,8 @@ private struct FooterSection: View {
             Menu {
                 Toggle("Abrir ao iniciar o Mac", isOn: Binding(get: { mixer.launchAtLogin }, set: mixer.setLaunchAtLogin))
                 Toggle("Lembrar o volume de cada app", isOn: Binding(get: { mixer.rememberVolumes }, set: mixer.setRememberVolumes))
+                Toggle("Tecla de Ditado (F5) abre o Fader", isOn: Binding(get: { mixer.dictationKeyOpensPanel }, set: mixer.setDictationKeyOpensPanel))
+                Text("Atalho: ⌃⌥V")
                 Divider()
                 Button("Abrir Ajustes de Som…") {
                     NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Sound-Settings.extension")!)

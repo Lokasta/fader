@@ -61,7 +61,8 @@ build/Build/Products/Debug/Fader.app/Contents/MacOS/Fader --snapshot painel.png
 
 ## Abrindo o painel
 
-- Ícone na barra de menu (ao lado do Som), controle da Central de Controle, atalho **⌃⌥V** de qualquer app, ou abrir o Fader de novo pelo Spotlight.
+- Ícone na barra de menu (ao lado do Som), controle da Central de Controle, tecla **F5** (a de Ditado), atalho **⌃⌥V** de qualquer app, ou abrir o Fader de novo pelo Spotlight.
+- O F5 é remapeado para F18 com `hidutil` (sem driver). Desligue em Engrenagem > "Tecla de Ditado (F5) abre o Fader" para voltar ao Ditado.
 - Barra lotada (notch) esconde ícones sem aviso. Para fixar o Fader perto do relógio:
   `pkill -x Fader; defaults write com.lokasta.fader "NSStatusItem Preferred Position Item-0" -float 330; open -a Fader`
   (o número é a distância da borda direita; o Som da Apple fica por volta de 320).

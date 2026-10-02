@@ -14,7 +14,7 @@ Menu bar app (macOS 15+, Swift/SwiftUI) for per-app volume using Core Audio Proc
 - `Fader/Model/VolumeStore.swift`: per-bundle-ID volume/mute in UserDefaults.
 - `Fader/UI/`: SwiftUI views. `Snapshot.swift` implements `--snapshot <png>`. `FloatingPanel.swift` is the Control Center-style panel opened by `fader://panel`.
 - `FaderControls/`: WidgetKit extension (macOS 26+) with one `ControlWidgetButton` that opens `fader://panel` via `OpenURLIntent`. Must stay sandboxed; the entitlement is declared in `project.yml` because XcodeGen rewrites the `.entitlements` file.
-- `Fader/UI/GlobalHotKey.swift`: ⌃⌥V via Carbon `RegisterEventHotKey`. Reopening the app (`applicationShouldHandleReopen`) also shows the panel.
+- `Fader/UI/GlobalHotKey.swift`: ⌃⌥V and F18 via Carbon `RegisterEventHotKey`. `DictationKeyRemap.swift` maps the Dictation key (F5, consumer 0xCF) to F18 with `hidutil`, merged with existing user mappings; the mapping resets on reboot and is reapplied at launch. Reopening the app (`applicationShouldHandleReopen`) also shows the panel.
 - `fader://` URLs are handled with a raw Apple Event handler in `AppDelegate` (SwiftUI swallows them otherwise).
 - `scripts/install.sh`: Release build, install to /Applications, relaunch. `scripts/make-icon.swift`: draws the app icon.
 

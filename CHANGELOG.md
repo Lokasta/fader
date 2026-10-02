@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-02 -- 1.3.0
+
+**Feature**: the Dictation key (F5) opens the panel.
+
+- `DictationKeyRemap` maps HID consumer usage 0xCF (Dictation) to F18 with `hidutil` user key mappings, reapplied at launch and preserving other mappings. Fader listens for F18.
+- Gear menu option "Tecla de Ditado (F5) abre o Fader" (on by default); turning it off restores Dictation immediately.
+- `GlobalHotKey` now supports several hot keys (each handler checks its own ID).
+
 ## 2026-10-02 -- 1.2.0
 
 **Feature**: more ways to open the panel when the menu bar is crowded.

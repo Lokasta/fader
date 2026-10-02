@@ -1,3 +1,4 @@
+import Carbon.HIToolbox
 import SwiftUI
 
 @main
@@ -28,7 +29,7 @@ struct FaderApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor static var mixer: Mixer?
     @MainActor private lazy var panel: FloatingPanel? = Self.mixer.map(FloatingPanel.init)
-    private var hotKey: GlobalHotKey?
+    private var hotKeys: [GlobalHotKey] = []
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         NSAppleEventManager.shared().setEventHandler(
@@ -41,9 +42,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     func applicationDidFinishLaunching(_ notification: Notification) {
-        hotKey = GlobalHotKey { [weak self] in
+        let toggle: () -> Void = { [weak self] in
             MainActor.assumeIsolated { self?.panel?.toggle() }
         }
+        hotKeys = [
+            // ⌃⌥V: V for volume, rarely taken by other apps.
+            GlobalHotKey(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(controlKey | optionKey), action: toggle),
+            // F18: what the Dictation key (F5) sends once DictationKeyRemap is on.
+            GlobalHotKey(keyCode: UInt32(kVK_F18), action: toggle),
+        ]
     }
 
     /// Opening Fader again (Spotlight, Finder, Dock) shows the panel: the reliable way in
