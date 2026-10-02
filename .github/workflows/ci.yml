@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  style:
+    name: No em dashes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail on U+2014 in tracked text files
+        run: |
+          EM_DASH="$(printf '\xe2\x80\x94')"
+          if git grep -nI -F "$EM_DASH"; then
+            echo "::error::Found the em dash character (U+2014) in the files above. Use a comma, colon, parentheses or two sentences instead."
+            exit 1
+          fi
+          echo "No em dashes found."
+
+  build-test:
+    name: Build and test
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        run: |
+          # Newest non-beta Xcode 26.x on the image; fails loudly if the image has none.
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -vi beta | sort -V | tail -n 1)
+          if [ -z "$XCODE" ]; then
+            echo "::error::No Xcode 26 found in /Applications"
+            ls -d /Applications/Xcode* || true
+            exit 1
+          fi
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build and run unit tests (ad-hoc signed)
+        run: |
+          set -o pipefail
+          xcodebuild -project Fader.xcodeproj -scheme Fader \
+            -destination 'platform=macOS' \
+            -derivedDataPath build \
+            test
