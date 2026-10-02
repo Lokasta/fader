@@ -8,6 +8,7 @@ Volume por app no macOS, direto da barra de menu. Sem driver, sem BlackHole, sem
 
 - **Volume de cada app** de 0 a 200%: baixa o Discord sem baixar o jogo, dá um boost num vídeo baixinho. Acima de 100% um limitador suave evita estourar.
 - **Mudo por app** com um clique no alto-falante.
+- **Medidores ao vivo** embaixo de cada slider (apps, saída e microfone), mostrando o nível que está saindo agora. Só rodam com o painel aberto.
 - **Lembra o volume** de cada app e reaplica sozinho quando ele volta a tocar.
 - **Saída e microfone**: troca o dispositivo padrão e ajusta o volume de cada um (o mesmo que Ajustes > Som faz).
 - Agrupa processos auxiliares no app certo: o áudio do Chrome, do Safari (WebKit) ou de um `afplay` no terminal aparece com o nome e o ícone do app dono.
@@ -33,7 +34,8 @@ Apps em 100% não passam por nada disso: o áudio deles segue o caminho normal d
 
 ### O microfone fica intocado
 
-- O Fader **nunca abre um stream de entrada**. A bolinha laranja de microfone não acende por causa dele.
+- O Fader só abre o microfone pra mostrar o medidor, **e só enquanto o painel está aberto**. Fechou o painel, o mic é solto. A bolinha laranja acende só nesse intervalo.
+- Mic Bluetooth nunca é aberto pelo medidor (forçaria o fone pro modo de chamada).
 - Quando a saída é um fone Bluetooth (AirPods), o agregado também expõe o microfone do fone. O Fader desliga esses streams no IO proc (`kAudioDevicePropertyIOProcStreamUsage`), então o fone não cai no modo de chamada.
 - O controle de microfone só muda o dispositivo padrão e o volume de entrada, que são propriedades do sistema.
 - Se o Fader fechar ou travar, o macOS destrói os taps junto com o processo e o som volta ao normal na hora.

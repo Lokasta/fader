@@ -41,7 +41,6 @@ final class Mixer: ObservableObject {
     /// A tap that failed isn't retried until the app's processes or the output device change.
     private var failedAttempts: [String: String] = [:]
     private var identities: [pid_t: AudioAppIdentity] = [:]
-    private var tapsWithSignal: Set<String> = []
     private var timer: Timer?
     private let log = Logger(subsystem: "com.lokasta.fader", category: "mixer")
 
@@ -197,7 +196,6 @@ final class Mixer: ObservableObject {
         recentlyPlaying.formIntersection(groups.keys)
         for key in Array(taps.keys) where groups[key] == nil {
             taps.removeValue(forKey: key)?.invalidate()
-            tapsWithSignal.remove(key)
         }
 
         var next: [AppEntry] = []
@@ -228,49 +226,96 @@ final class Mixer: ObservableObject {
         let next = DeviceState.read(direction)
         switch direction {
         case .output: if next != output { output = next }
-        case .input: if next != input { input = next }
+        case .input:
+            if next != input {
+                input = next
+                updateMicMeter()
+            }
         }
     }
 
-    /// Keeps a tap alive exactly when it's needed: any app not at 100% gets one; an app back at
-    /// 100% keeps its tap while playing (tearing it down mid-song would glitch) and loses it once quiet.
+    /// Decides which tap an app gets:
+    /// - **mixing** (mutes the original, replays at our gain) whenever it isn't at 100%, and kept
+    ///   while it plays even back at 100% (tearing it down mid-song would glitch);
+    /// - **meter-only** (audio untouched) while the panel is open, so 100% apps still show a level;
+    /// - **none** otherwise: untouched apps run through macOS exactly as before.
     private func reconcileTap(_ entry: inout AppEntry) {
         let gain = entry.effectiveGain
-        let needsTap = abs(gain - 1) > 0.001
+        let needsMix = abs(gain - 1) > 0.001
+        let wantsMeter = isMetering && entry.isPlaying
+        let existing = taps[entry.id]
 
-        if let tap = taps[entry.id] {
-            if !tapsWithSignal.contains(entry.id), tap.takePeak() > 0 {
-                tapsWithSignal.insert(entry.id)
-                let name = entry.name
-                log.info("audio flowing through tap for \(name, privacy: .public)")
-            }
-            let sameDevice = tap.outputDeviceID == currentOutput
-            let sameProcesses = tap.processes == entry.processes
-            if sameDevice && (needsTap || entry.isPlaying) && (sameProcesses || tap.update(processes: entry.processes)) {
-                tap.gain = gain
+        if let tap = existing, tap.outputDeviceID == currentOutput {
+            let useful = tap.isMeterOnly ? (!needsMix && wantsMeter) : (needsMix || entry.isPlaying)
+            if useful && (tap.processes == entry.processes || tap.update(processes: entry.processes)) {
+                if !tap.isMeterOnly { tap.gain = gain }
                 return
             }
-            taps.removeValue(forKey: entry.id)?.invalidate()
-            tapsWithSignal.remove(entry.id)
         }
 
-        guard needsTap, permission == .authorized, currentOutput.isValid else { return }
-
-        let attempt = "\(entry.processes)-\(currentOutput)"
-        guard failedAttempts[entry.id] != attempt else { return }
-
-        do {
-            taps[entry.id] = try AppTap(processes: entry.processes, outputDevice: currentOutput, name: entry.name, gain: gain)
-            let name = entry.name, count = entry.processes.count
-            log.info("tapping \(name, privacy: .public) (\(count) processes) at \(gain, privacy: .public)")
-            entry.failure = nil
-            failedAttempts[entry.id] = nil
-        } catch {
-            let id = entry.id
-            log.error("tap for \(id, privacy: .public) failed: \(String(describing: error), privacy: .public)")
-            entry.failure = "Não consegui controlar esse app"
-            failedAttempts[entry.id] = attempt
+        // Build the replacement before dropping the old tap so the app's audio never gaps.
+        var replacement: AppTap?
+        if needsMix || wantsMeter, permission == .authorized, currentOutput.isValid {
+            let attempt = "\(entry.processes)-\(currentOutput)-\(needsMix)"
+            if failedAttempts[entry.id] != attempt {
+                do {
+                    replacement = try AppTap(processes: entry.processes, outputDevice: currentOutput, name: entry.name, gain: gain, meterOnly: !needsMix)
+                    let name = entry.name, kind = needsMix ? "mixing" : "metering"
+                    log.info("\(kind, privacy: .public) tap for \(name, privacy: .public) at \(gain, privacy: .public)")
+                    entry.failure = nil
+                    failedAttempts[entry.id] = nil
+                } catch {
+                    let id = entry.id
+                    log.error("tap for \(id, privacy: .public) failed: \(String(describing: error), privacy: .public)")
+                    if needsMix { entry.failure = "Não consegui controlar esse app" }
+                    failedAttempts[entry.id] = attempt
+                }
+            }
         }
+        existing?.invalidate()
+        taps[entry.id] = replacement
+    }
+
+    // MARK: - Level meters
+
+    let levels = LevelMeters()
+    private let micMeter = MicMeter()
+    private var meteringViewers = 0
+    private var meterTimer: Timer?
+    private var isMetering: Bool { meteringViewers > 0 }
+
+    /// Called when a panel becomes visible. Meters (and the mic) only run while someone looks.
+    func beginMetering() {
+        meteringViewers += 1
+        guard meteringViewers == 1 else { return }
+        refresh()
+        updateMicMeter()
+        meterTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.pollLevels() }
+        }
+    }
+
+    func endMetering() {
+        meteringViewers = max(0, meteringViewers - 1)
+        guard meteringViewers == 0 else { return }
+        meterTimer?.invalidate()
+        meterTimer = nil
+        micMeter.stop()
+        levels.reset()
+        refresh()
+    }
+
+    private func updateMicMeter() {
+        guard isMetering else { return }
+        micMeter.start(on: input.current, transport: input.currentDevice?.transport)
+        levels.micAvailability = micMeter.availability
+    }
+
+    private func pollLevels() {
+        var peaks: [String: Float] = [:]
+        for (key, tap) in taps { peaks[key] = tap.takePeak() }
+        levels.update(apps: peaks, mic: micMeter.takePeak())
+        if micMeter.availability == .noPermission { updateMicMeter() }
     }
 
     // MARK: - Core Audio notifications
@@ -292,6 +337,8 @@ final class Mixer: ObservableObject {
 
     private func tearDown() {
         timer?.invalidate()
+        meterTimer?.invalidate()
+        micMeter.stop()
         for tap in taps.values { tap.invalidate() }
         taps.removeAll()
     }

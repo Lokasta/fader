@@ -61,11 +61,15 @@ struct AppRow: View {
                     .foregroundStyle(entry.muted ? Color.red : .secondary)
                     .help(entry.muted ? "Ativar som" : "Silenciar")
 
-                    VolumeSlider(value: Binding(
-                        get: { entry.volume },
-                        set: { mixer.setVolume($0, for: entry.id) }
-                    ))
-                    .opacity(entry.muted ? 0.4 : 1)
+                    VStack(spacing: 3) {
+                        VolumeSlider(value: Binding(
+                            get: { entry.volume },
+                            set: { mixer.setVolume($0, for: entry.id) }
+                        ))
+                        .opacity(entry.muted ? 0.4 : 1)
+                        AppLevel(levels: mixer.levels, id: entry.id)
+                            .padding(.horizontal, 2)
+                    }
                 }
             }
         }
@@ -74,6 +78,14 @@ struct AppRow: View {
         .background(hovering ? Color.primary.opacity(0.05) : .clear, in: RoundedRectangle(cornerRadius: 8))
         .onHover { hovering = $0 }
     }
+}
+
+/// Observes only the meters, so level updates don't redraw the rest of the row.
+private struct AppLevel: View {
+    @ObservedObject var levels: LevelMeters
+    let id: String
+
+    var body: some View { LevelBar(level: levels.apps[id] ?? 0) }
 }
 
 /// 0–200% slider with a soft detent at 100% and a tick marking it, so "normal" is easy to find.
@@ -94,8 +106,8 @@ struct VolumeSlider: View {
         .background(alignment: .center) {
             Capsule()
                 .fill(Color.secondary.opacity(0.5))
-                .frame(width: 1.5, height: 9)
-                .offset(y: 7)
+                .frame(width: 1.5, height: 6)
+                .offset(y: -8)
                 .allowsHitTesting(false)
         }
     }

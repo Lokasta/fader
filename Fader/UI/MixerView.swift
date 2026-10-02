@@ -30,6 +30,9 @@ struct MixerView: View {
                 .padding(.vertical, 10)
         }
         .frame(width: 340)
+        .background(WindowVisibility { visible in
+            visible ? mixer.beginMetering() : mixer.endMetering()
+        })
     }
 }
 
@@ -99,12 +102,45 @@ private struct DeviceSection: View {
                     .frame(width: 38, alignment: .trailing)
             }
             .help(state.volumeSettable ? "" : "Esse dispositivo não deixa o macOS mudar o volume")
+
+            DeviceLevel(levels: mixer.levels, direction: direction)
+                .padding(.leading, 26)
+                .padding(.trailing, 46)
         }
     }
 
     private var symbol: String {
         if isOutput { return VolumeSymbol.name(for: shownVolume) }
         return state.muted || shownVolume < 0.001 ? "mic.slash.fill" : "mic.fill"
+    }
+}
+
+/// Output: the loudest app right now. Microphone: the mic itself (only while the panel is open).
+private struct DeviceLevel: View {
+    @ObservedObject var levels: LevelMeters
+    let direction: AudioDirection
+
+    var body: some View {
+        if direction == .output {
+            LevelBar(level: levels.output)
+        } else {
+            switch levels.micAvailability {
+            case .on, .unavailable:
+                LevelBar(level: levels.mic)
+            case .bluetooth:
+                note("Medidor desligado em mic Bluetooth (pra não derrubar a qualidade do fone)")
+            case .noPermission:
+                note("Permita o microfone pro Fader pra ver o nível")
+            }
+        }
+    }
+
+    private func note(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 9.5))
+            .foregroundStyle(.tertiary)
+            .lineLimit(1)
+            .truncationMode(.tail)
     }
 }
 

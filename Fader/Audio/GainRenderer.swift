@@ -5,7 +5,7 @@ import Synchronization
 /// Everything the audio thread touches lives here so the IO block never allocates or locks.
 final class RenderContext: @unchecked Sendable {
     private let targetBits = Atomic<UInt32>(Float(1).bitPattern)
-    private let peakBits = Atomic<UInt32>(Float(0).bitPattern)
+    private let peak = PeakBox()
 
     /// Only touched by the audio thread after the IO proc starts.
     var currentGain: Float = 1
@@ -13,11 +13,14 @@ final class RenderContext: @unchecked Sendable {
     let inputBufferOffset: Int
     let leftChannel: Int
     let rightChannel: Int
+    /// False for metering taps: the app's audio still plays normally, we only measure it.
+    let passesAudio: Bool
 
-    init(inputBufferOffset: Int, leftChannel: Int, rightChannel: Int) {
+    init(inputBufferOffset: Int, leftChannel: Int, rightChannel: Int, passesAudio: Bool = true) {
         self.inputBufferOffset = inputBufferOffset
         self.leftChannel = leftChannel
         self.rightChannel = rightChannel
+        self.passesAudio = passesAudio
     }
 
     var targetGain: Float {
@@ -25,22 +28,26 @@ final class RenderContext: @unchecked Sendable {
         set { targetBits.store(newValue.bitPattern, ordering: .relaxed) }
     }
 
-    /// Loudest input sample since the last call, so the UI thread can tell a live tap from a silent one.
-    func takePeak() -> Float {
-        Float(bitPattern: peakBits.exchange(Float(0).bitPattern, ordering: .relaxed))
-    }
+    /// Loudest sample as heard (after this app's gain) since the last call. Drives the level meters.
+    func takePeak() -> Float { peak.take() }
 
     func render(input: UnsafePointer<AudioBufferList>, output: UnsafeMutablePointer<AudioBufferList>) {
         let target = targetGain
         let inputList = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: input))
-        let peak = GainRenderer.peak(of: inputList, firstBuffer: inputBufferOffset)
-        if peak > Float(bitPattern: peakBits.load(ordering: .relaxed)) {
-            peakBits.store(peak.bitPattern, ordering: .relaxed)
+        let outputList = UnsafeMutableAudioBufferListPointer(output)
+        let heard = passesAudio ? max(currentGain, target) : 1
+        peak.raise(to: GainRenderer.peak(of: inputList, firstBuffer: inputBufferOffset) * heard)
+
+        guard passesAudio else {
+            for buffer in outputList {
+                if let data = buffer.mData { memset(data, 0, Int(buffer.mDataByteSize)) }
+            }
+            return
         }
         GainRenderer.render(
             input: inputList,
             inputBufferOffset: inputBufferOffset,
-            output: UnsafeMutableAudioBufferListPointer(output),
+            output: outputList,
             leftChannel: leftChannel,
             rightChannel: rightChannel,
             from: currentGain,

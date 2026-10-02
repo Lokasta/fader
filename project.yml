@@ -7,8 +7,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.3.0"
-    CURRENT_PROJECT_VERSION: "4"
+    MARKETING_VERSION: "1.4.0"
+    CURRENT_PROJECT_VERSION: "5"
     DEVELOPMENT_TEAM: N45547YJ4V
 targets:
   Fader:
@@ -30,7 +30,12 @@ targets:
         CFBundleURLTypes:
           - CFBundleURLName: com.lokasta.fader
             CFBundleURLSchemes: [fader]
+        NSMicrophoneUsageDescription: "O Fader mostra o nível do seu microfone enquanto o painel está aberto. Nada é gravado."
         NSAudioCaptureUsageDescription: "O Fader precisa acessar o áudio de cada app para controlar o volume dele individualmente. Nada é gravado nem sai do seu Mac."
+    entitlements:
+      path: Fader/Fader.entitlements
+      properties:
+        com.apple.security.device.audio-input: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.lokasta.fader

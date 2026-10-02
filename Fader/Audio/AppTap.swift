@@ -11,6 +11,8 @@ import os
 final class AppTap {
     private(set) var processes: [AudioObjectID]
     let outputDeviceID: AudioObjectID
+    /// Metering taps leave the app's audio untouched (not muted, nothing re-rendered).
+    let isMeterOnly: Bool
 
     private var tapID = AudioObjectID.unknown
     private var aggregateID = AudioObjectID.unknown
@@ -25,9 +27,10 @@ final class AppTap {
         set { context.targetGain = max(0, newValue) }
     }
 
-    init(processes: [AudioObjectID], outputDevice: AudioObjectID, name: String, gain: Float) throws {
+    init(processes: [AudioObjectID], outputDevice: AudioObjectID, name: String, gain: Float, meterOnly: Bool = false) throws {
         self.processes = processes
         self.outputDeviceID = outputDevice
+        self.isMeterOnly = meterOnly
 
         guard let outputUID = AudioDevices.uid(of: outputDevice) else {
             throw CoreAudioError(status: kAudioHardwareBadDeviceError, context: "saída sem UID")
@@ -37,7 +40,8 @@ final class AppTap {
         context = RenderContext(
             inputBufferOffset: AudioDevices.streamCount(of: outputDevice, scope: kAudioObjectPropertyScopeInput),
             leftChannel: stereo.left,
-            rightChannel: stereo.right
+            rightChannel: stereo.right,
+            passesAudio: !meterOnly
         )
         context.targetGain = gain
 
@@ -55,7 +59,7 @@ final class AppTap {
         let description = CATapDescription(stereoMixdownOfProcesses: processes)
         description.uuid = UUID()
         description.name = "Fader (\(name))"
-        description.muteBehavior = .mutedWhenTapped
+        description.muteBehavior = isMeterOnly ? .unmuted : .mutedWhenTapped
         description.isPrivate = true
 
         try check(AudioHardwareCreateProcessTap(description, &tapID), "criar tap")

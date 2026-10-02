@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-02 -- 1.4.0
+
+**Feature**: live level meters.
+
+- A level bar under every app slider, the output slider (loudest app) and the microphone slider. dB scale, instant attack, smooth release, green/yellow/red.
+- App meters show what you hear (after that app's volume). Apps at 100% get a meter-only tap (`muteBehavior = .unmuted`, nothing re-rendered) while a panel is visible, so their audio path is unchanged.
+- Switching an app from metering to mixing builds the new tap before dropping the old one, so audio never gaps.
+- Microphone meter (`MicMeter`) opens the default input only while a panel is visible and never on Bluetooth inputs (would force headsets into call mode). Adds `NSMicrophoneUsageDescription` and the `com.apple.security.device.audio-input` entitlement.
+- Metering starts and stops from window occlusion (`WindowVisibility`), for both the menu bar popover and the floating panel.
+- Removed the "audio flowing" log, which drained the peaks the meters now read. 15 unit tests.
+
 ## 2026-10-02 -- 1.3.0
 
 **Feature**: the Dictation key (F5) opens the panel.

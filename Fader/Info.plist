@@ -39,5 +39,7 @@
 	<string>O Fader precisa acessar o áudio de cada app para controlar o volume dele individualmente. Nada é gravado nem sai do seu Mac.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Lokasta</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>O Fader mostra o nível do seu microfone enquanto o painel está aberto. Nada é gravado.</string>
 </dict>
 </plist>
