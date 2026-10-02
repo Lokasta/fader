@@ -74,6 +74,7 @@ You can't hear audio, so verify with these instead:
 - UI strings are English in code and translated in `Fader/Localizable.xcstrings` (pt-BR). Use `String(localized:)` for strings in ternaries or variables (`Text(String)` is not localized), and avoid `%` in localizable keys.
 - Update `CHANGELOG.md` for every user-visible change and bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml`.
 - Commit messages: imperative subject, body explaining why.
+- CI (`.github/workflows/ci.yml`) builds and runs the tests on every push and PR, and fails on any em dash (U+2014) in tracked files. [CONTRIBUTING.md](CONTRIBUTING.md) has the PR checklist.
 
 ## Private APIs in use
 

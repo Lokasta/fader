@@ -10,6 +10,10 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Lokasta/fader/actions/workflows/ci.yml"><img src="https://github.com/Lokasta/fader/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+</p>
+
+<p align="center">
   <img src="docs/panel.png" width="340" alt="Fader panel: output and microphone at the top, one slider per app below">
 </p>
 
@@ -97,6 +101,10 @@ build/Build/Products/Debug/Fader.app/Contents/MacOS/Fader --snapshot panel.png  
 ```
 
 Contributions are welcome. Read [AGENTS.md](AGENTS.md) first (yes, humans too), keep the IO path real-time safe, and add a [CHANGELOG](CHANGELOG.md) entry.
+
+## Contributing
+
+Bug reports, ideas and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) has the setup, the PR checklist and how to verify audio changes; CI builds and tests every pull request.
 
 ## License
 

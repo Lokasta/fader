@@ -1,0 +1,75 @@
+name: Bug report
+description: Something in Fader doesn't work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Security problems should be reported privately instead, see SECURITY.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Play music in Spotify
+        2. Turn Spotify down to 50% in Fader
+        3. ...
+  - type: input
+    id: affected-app
+    attributes:
+      label: Affected app(s)
+      description: Which app's audio was affected (name and version if you know it).
+      placeholder: Spotify 1.2.x, Chrome, Discord...
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      description: Apple menu > About This Mac.
+      placeholder: macOS 26.0 (25A354)
+    validations:
+      required: true
+  - type: input
+    id: fader-version
+    attributes:
+      label: Fader version
+      description: Shown at the bottom of the Fader panel ("Lokasta's Fader 1.6.1").
+      placeholder: "1.6.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: output
+    attributes:
+      label: Output device type
+      options:
+        - Built-in speakers
+        - Wired headphones (3.5 mm jack)
+        - Bluetooth (AirPods or other)
+        - USB audio interface or headset
+        - HDMI / DisplayPort monitor or TV
+        - AirPlay
+        - Other (describe below)
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Output device model
+      placeholder: AirPods Pro 2, Focusrite Scarlett 2i2...
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Reproduce the problem, then run this in Terminal within 5 minutes and paste the output (it contains app names and device names, nothing else personal):
+
+        `/usr/bin/log show --last 5m --predicate 'subsystem == "com.lokasta.fader"' --info`
+      render: text

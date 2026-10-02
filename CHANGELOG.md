@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+**Project**
+
+- CI (`.github/workflows/ci.yml`): every push to main and every pull request builds the app and runs the unit tests on macOS 26 with Xcode 26, ad-hoc signed, and fails if any tracked file contains an em dash.
+- `CONTRIBUTING.md`, issue forms (bug report with macOS/Fader version, output device and a logs command; feature request), a pull request template with the checklist, and Dependabot for GitHub Actions. README shows the CI badge.
+
 **Website**
 
 - The hero screenshot is now an interactive HTML copy of the panel: draggable sliders with the 100% detent, mute buttons, and live meters shaped per app (music, call, game, video). With reduced motion the meters hold steady levels that still follow volume and mute.
