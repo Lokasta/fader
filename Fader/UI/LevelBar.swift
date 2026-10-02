@@ -27,7 +27,6 @@ struct LevelBar: View {
             }
         }
         .frame(height: 3)
-        .animation(.linear(duration: 1.0 / 30), value: level)
         .accessibilityHidden(true)
     }
 }

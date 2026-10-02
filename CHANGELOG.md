@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-02 -- 1.5.1
+
+**Performance**: lighter idle loop. Measured 7.2% CPU with the panel open before, 0.56% with the panel closed and one app being mixed after.
+
+- PID and bundle ID of each Core Audio process object are read once and cached; only "is playing" is polled.
+- Device lists are cached and re-read only when Core Audio reports a device change; the per-second refresh reads just volume and mute.
+- Bursts of Core Audio notifications are folded into one refresh (100 ms).
+- Meter bars no longer run a SwiftUI animation on every 30 Hz update.
+
 ## 2026-10-02 -- 1.5.0
 
 **Performance / Fix**: stress-tested with 20 apps playing at once.

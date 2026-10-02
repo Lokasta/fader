@@ -183,6 +183,7 @@ final class Mixer: ObservableObject {
         }
         refreshDevices(.output)
         refreshDevices(.input)
+        deviceListsStale = false
 
         let processes = AudioProcesses.list()
         let alive = Set(processes.map(\.pid))
@@ -225,8 +226,16 @@ final class Mixer: ObservableObject {
         updateMeterHub()
     }
 
+    /// Device lists only change when hardware comes or goes (Core Audio tells us), so they're
+    /// cached; the per-second refresh only re-reads the cheap volume and mute values.
+    private var deviceListsStale = true
+    private var cachedDevices: [AudioDirection: [AudioDevice]] = [:]
+
     private func refreshDevices(_ direction: AudioDirection) {
-        let next = DeviceState.read(direction)
+        if deviceListsStale || cachedDevices[direction] == nil {
+            cachedDevices[direction] = AudioDevices.devices(direction)
+        }
+        let next = DeviceState.read(direction, devices: cachedDevices[direction] ?? [])
         switch direction {
         case .output: if next != output { output = next }
         case .input:
@@ -336,7 +345,25 @@ final class Mixer: ObservableObject {
         for selector in selectors {
             var address = propertyAddress(selector)
             AudioObjectAddPropertyListenerBlock(.system, &address, .main) { [weak self] _, _ in
-                MainActor.assumeIsolated { self?.refresh() }
+                MainActor.assumeIsolated {
+                    if selector == kAudioHardwarePropertyDevices { self?.deviceListsStale = true }
+                    self?.scheduleRefresh()
+                }
+            }
+        }
+    }
+
+    /// Core Audio fires bursts of notifications (an app starting can add several processes);
+    /// fold each burst into a single refresh.
+    private var refreshScheduled = false
+
+    private func scheduleRefresh() {
+        guard !refreshScheduled else { return }
+        refreshScheduled = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            MainActor.assumeIsolated {
+                self?.refreshScheduled = false
+                self?.refresh()
             }
         }
     }
@@ -364,11 +391,11 @@ struct DeviceState: Equatable {
 
     var currentDevice: AudioDevice? { devices.first { $0.id == current } }
 
-    static func read(_ direction: AudioDirection) -> DeviceState {
+    static func read(_ direction: AudioDirection, devices: [AudioDevice]) -> DeviceState {
         let device = AudioDevices.defaultDevice(direction)
         return DeviceState(
             direction: direction,
-            devices: AudioDevices.devices(direction),
+            devices: devices,
             current: device,
             volume: AudioDevices.volume(of: device, direction),
             volumeSettable: AudioDevices.canSetVolume(of: device, direction),

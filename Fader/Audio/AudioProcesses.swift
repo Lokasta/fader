@@ -31,13 +31,27 @@ enum AudioProcesses {
         return unsafeBitCast(symbol, to: ResponsiblePIDFunction.self)
     }()
 
+    /// PID and bundle ID never change for a process object, so they're read once.
+    /// Only "is it playing" is polled.
+    @MainActor private static var known: [AudioObjectID: (pid: pid_t, bundleID: String?)] = [:]
+
+    @MainActor
     static func list() -> [AudioProcess] {
         let ownPID = ProcessInfo.processInfo.processIdentifier
         let ids = (try? AudioObjectID.system.readArray(kAudioHardwarePropertyProcessObjectList, element: AudioObjectID.unknown)) ?? []
+        known = known.filter { ids.contains($0.key) }
         return ids.compactMap { id in
-            guard let pid: pid_t = try? id.read(kAudioProcessPropertyPID, default: pid_t(-1)), pid > 0, pid != ownPID else { return nil }
+            let info: (pid: pid_t, bundleID: String?)
+            if let cached = known[id] {
+                info = cached
+            } else {
+                guard let pid: pid_t = try? id.read(kAudioProcessPropertyPID, default: pid_t(-1)), pid > 0 else { return nil }
+                info = (pid, try? id.readString(kAudioProcessPropertyBundleID))
+                known[id] = info
+            }
+            guard info.pid != ownPID else { return nil }
             let running: UInt32 = (try? id.read(kAudioProcessPropertyIsRunningOutput, default: UInt32(0))) ?? 0
-            return AudioProcess(objectID: id, pid: pid, isPlaying: running != 0, bundleID: try? id.readString(kAudioProcessPropertyBundleID))
+            return AudioProcess(objectID: id, pid: info.pid, isPlaying: running != 0, bundleID: info.bundleID)
         }
     }
 
