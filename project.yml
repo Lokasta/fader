@@ -1,0 +1,57 @@
+name: Fader
+options:
+  bundleIdPrefix: com.lokasta
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: N45547YJ4V
+targets:
+  Fader:
+    type: application
+    platform: macOS
+    sources: [Fader]
+    info:
+      path: Fader/Info.plist
+      properties:
+        CFBundleDisplayName: Fader
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHumanReadableCopyright: "Lokasta"
+        NSAudioCaptureUsageDescription: "O Fader precisa acessar o áudio de cada app para controlar o volume dele individualmente. Nada é gravado nem sai do seu Mac."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lokasta.fader
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Developer ID Application"
+        ENABLE_HARDENED_RUNTIME: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        COMBINE_HIDPI_IMAGES: YES
+  FaderTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [FaderTests]
+    dependencies:
+      - target: Fader
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lokasta.fader.tests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Developer ID Application"
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Fader.app/Contents/MacOS/Fader
+        BUNDLE_LOADER: $(TEST_HOST)
+schemes:
+  Fader:
+    build:
+      targets:
+        Fader: all
+        FaderTests: [test]
+    test:
+      targets: [FaderTests]
