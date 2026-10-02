@@ -17,7 +17,7 @@ jobs:
     name: No em dashes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Fail on U+2014 in tracked text files
         run: |
           EM_DASH="$(printf '\xe2\x80\x94')"
@@ -32,7 +32,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Select Xcode 26
         run: |
