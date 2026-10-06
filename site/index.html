@@ -916,6 +916,7 @@ footer nav a:hover { color: var(--text); }
         <p>No update checks, no analytics, no crash reporting. Audio is processed in memory and discarded.</p>
       </article>
     </div>
+    <p class="note"><strong>Inside Chrome, too.</strong> Expand Chrome to give compatible playing audio/video tabs their own volume, mute and reset. No extension needed. Web Audio and unsupported players use Chrome's main slider. <a href="https://github.com/Lokasta/fader#chrome-tabs">Set up tab controls</a>.</p>
   </div>
 </section>
 
@@ -990,7 +991,7 @@ footer nav a:hover { color: var(--text); }
       <p class="big-zero-cap">network requests, analytics, crash reports</p>
     </div>
     <div class="perm-col">
-      <div class="settings" aria-label="macOS System Settings showing Fader's two permissions">
+      <div class="settings" aria-label="macOS System Settings showing Fader's permissions">
         <div class="win-bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="win-title">Privacy &amp; Security</span></div>
         <div class="set-group">
           <div class="set-head"><span class="set-ic" style="--c:#ff375f"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2" fill="none" stroke="#fff" stroke-width="2"/><circle cx="12" cy="11" r="2.6" fill="#fff"/><path d="M8 21h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span><b>Screen &amp; System Audio Recording</b><span class="req">Required</span></div>
@@ -1002,8 +1003,13 @@ footer nav a:hover { color: var(--text); }
           <div class="set-row"><img src="assets/icon.png" alt="" width="22" height="22"><span>Lokasta's Fader</span><span class="tog on"></span></div>
           <p class="set-note">Only for the mic meter, only while the panel is open, never on Bluetooth mics. Deny it and everything else still works.</p>
         </div>
+        <div class="set-group">
+          <div class="set-head"><span class="set-ic" style="--c:#5e5ce6"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 9h18M8 4v5" stroke="#fff" stroke-width="2"/></svg></span><b>Automation: Chrome</b><span class="req opt">Optional</span></div>
+          <div class="set-row"><img src="assets/icon.png" alt="" width="22" height="22"><span>Lokasta's Fader</span><span class="tog"></span></div>
+          <p class="set-note">Only after enabling tab controls. Adjusts compatible audio/video players; tab information stays in memory on your Mac. Also requires Chrome's Allow JavaScript from Apple Events setting.</p>
+        </div>
       </div>
-      <p class="quit-note"><svg viewBox="0 0 24 24"><path d="M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><strong>If Fader quits,</strong> macOS destroys its taps and every app's audio is back to normal instantly. Details in <a href="https://github.com/Lokasta/fader/blob/main/SECURITY.md">SECURITY.md</a>.</span></p>
+      <p class="quit-note"><svg viewBox="0 0 24 24"><path d="M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><strong>If Fader quits,</strong> macOS destroys its taps immediately. Chrome player adjustments restore on a normal quit, with a watchdog after lost contact. Details in <a href="https://github.com/Lokasta/fader/blob/main/SECURITY.md">SECURITY.md</a>.</span></p>
     </div>
   </div>
 </section>
@@ -1106,7 +1112,7 @@ git clone https://github.com/Lokasta/fader &amp;&amp; cd fader
           <div><span class="ps">$</span> claude</div>
           <div class="ask"><span class="u">&gt;</span> build and install Fader</div>
           <div class="out"><span class="dot"></span>Read AGENTS.md</div>
-          <div class="out"><span class="dot"></span>xcodegen generate, 15 tests passed</div>
+          <div class="out"><span class="dot"></span>xcodegen generate, 25 tests passed</div>
           <div class="out ok"><span class="dot"></span>Installed /Applications/Fader.app</div>
           <div class="ask"><span class="u">&gt;</span> add a shortcut to mute Spotify<span class="caret"></span></div>
         </div>

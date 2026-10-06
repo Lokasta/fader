@@ -81,6 +81,7 @@ final class FloatingPanel {
 
         // Rows appear and disappear as apps start/stop playing: refit outside the layout pass.
         contentChanges = mixer.objectWillChange
+            .merge(with: mixer.chromeTabs.objectWillChange)
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [weak self, weak panel] _ in
                 MainActor.assumeIsolated {

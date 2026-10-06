@@ -196,7 +196,11 @@ private struct AppsSection: View {
             ScrollView {
                 VStack(spacing: 4) {
                     ForEach(mixer.apps) { entry in
-                        AppRow(entry: entry)
+                        if entry.id == ChromeAutomation.bundleID {
+                            ChromeAppRow(entry: entry, chrome: mixer.chromeTabs)
+                        } else {
+                            AppRow(entry: entry)
+                        }
                     }
                 }
                 .padding(.horizontal, 8)
@@ -219,6 +223,7 @@ private struct FooterSection: View {
                 Toggle("Open at login", isOn: Binding(get: { mixer.launchAtLogin }, set: mixer.setLaunchAtLogin))
                 Toggle("Remember each app's volume", isOn: Binding(get: { mixer.rememberVolumes }, set: mixer.setRememberVolumes))
                 Toggle("Dictation key (F5) opens Fader", isOn: Binding(get: { mixer.dictationKeyOpensPanel }, set: mixer.setDictationKeyOpensPanel))
+                ChromeTabsToggle(chrome: mixer.chromeTabs)
                 Text("Shortcut: ⌃⌥V")
                 Divider()
                 Button("Open Sound Settings…") {
@@ -246,6 +251,14 @@ private struct FooterSection: View {
                 .foregroundStyle(.secondary)
                 .keyboardShortcut("q")
         }
+    }
+}
+
+private struct ChromeTabsToggle: View {
+    @ObservedObject var chrome: ChromeTabs
+
+    var body: some View {
+        Toggle("Chrome tab controls", isOn: Binding(get: { chrome.isEnabled }, set: chrome.setEnabled))
     }
 }
 

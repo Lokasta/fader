@@ -32,12 +32,32 @@
         }
       }
     },
+    "Allow Fader to control Chrome in System Settings > Privacy & Security > Automation.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permita que o Fader controle o Chrome em Ajustes > Privacidade e Segurança > Automação."
+          }
+        }
+      }
+    },
     "Allow microphone access to see the level": {
       "localizations": {
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
             "value": "Permita o microfone pro Fader pra ver o nível"
+          }
+        }
+      }
+    },
+    "Audio/video players only. Other tab audio uses Chrome's main slider.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Players de áudio e vídeo. Outros sons das abas usam o volume geral do Chrome."
           }
         }
       }
@@ -58,6 +78,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "Trocar o microfone padrão"
+          }
+        }
+      }
+    },
+    "Chrome didn't respond. Try again when it finishes loading.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Chrome não respondeu. Tente novamente quando ele terminar de carregar."
+          }
+        }
+      }
+    },
+    "Chrome tab controls": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controles por aba do Chrome"
+          }
+        }
+      }
+    },
+    "Collapsed": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recolhido"
+          }
+        }
+      }
+    },
+    "Control playing audio and video tabs separately.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controle separadamente as abas reproduzindo áudio e vídeo."
           }
         }
       }
@@ -88,6 +148,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "Clique duas vezes para restaurar"
+          }
+        }
+      }
+    },
+    "Enable tab controls": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativar controles por aba"
+          }
+        }
+      }
+    },
+    "Expanded": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expandido"
+          }
+        }
+      }
+    },
+    "In Chrome, choose View > Developer > Allow JavaScript from Apple Events, then try again.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Chrome, ative Visualizar > Desenvolvedor > Permitir JavaScript de eventos da Apple e tente novamente."
+          }
+        }
+      }
+    },
+    "Looking for playing tabs…": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Procurando abas com áudio…"
           }
         }
       }
@@ -142,12 +242,32 @@
         }
       }
     },
+    "Mute tab": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenciar aba"
+          }
+        }
+      }
+    },
     "No app is playing audio": {
       "localizations": {
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum app tocando áudio"
+          }
+        }
+      }
+    },
+    "No compatible tabs are playing audio.": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma aba compatível está reproduzindo áudio."
           }
         }
       }
@@ -272,6 +392,16 @@
         }
       }
     },
+    "Reset tab volume": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar volume da aba"
+          }
+        }
+      }
+    },
     "Reset volume": {
       "localizations": {
         "pt-BR": {
@@ -312,6 +442,26 @@
         }
       }
     },
+    "Tab volume": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume da aba"
+          }
+        }
+      }
+    },
+    "Tabs with audio": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abas com áudio"
+          }
+        }
+      }
+    },
     "This device doesn't let macOS change its volume": {
       "localizations": {
         "pt-BR": {
@@ -322,12 +472,32 @@
         }
       }
     },
+    "Try again": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tentar novamente"
+          }
+        }
+      }
+    },
     "Unmute": {
       "localizations": {
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
             "value": "Ativar som"
+          }
+        }
+      }
+    },
+    "Unmute tab": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desmutar aba"
           }
         }
       }

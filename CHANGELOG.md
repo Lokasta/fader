@@ -2,13 +2,27 @@
 
 ## Unreleased
 
+## 2026-10-06 -- 1.7.1
+
+**Chrome tabs**
+
+- Sleeping or discarded Chrome tabs no longer make the entire list fail. Each media command has its own deadline, unresponsive tabs back off for 15 seconds, and pending controls survive a temporary timeout.
+- Expand Google Chrome to control compatible playing audio/video tabs separately, with a 0-100% slider, mute and reset for each tab. Paused, ended, site-muted and video-only players are excluded; a tab muted by Fader stays listed while its player runs so it can be unmuted.
+- Opt in from the Chrome row or the gear menu. Allow Automation access to Chrome and enable Chrome's View > Developer > Allow JavaScript from Apple Events. No extension, network connection or microphone access is used.
+- Tab controls scale each player's existing volume and preserve its mute setting. Reset, disabling the feature and quitting Fader restore the player's settings. A watchdog also restores them after loss of contact (Chrome can delay timers in background tabs).
+- Web Audio, inaccessible cross-origin frames and other unsupported sources remain on Chrome's main slider. Tab titles, URLs and adjustments stay in memory and are not saved across browser sessions.
+- Snapshots and unit-test hosts no longer remap keys, request permissions, start microphone meters or control live Chrome tabs. `--snapshot-chrome-tabs` supplies a deterministic panel fixture.
+- CI exercises playback filtering, mute, volume scaling, navigation and restoration against offline media fixtures in an isolated Chromium instance.
+
 **Project**
 
+- Release packages include SHA-256 checksums. Publishing requires a clean checkout and a pushed version tag at the release commit, and uploads notes from the versioned changelog.
 - CI (`.github/workflows/ci.yml`): every push to main and every pull request builds the app and runs the unit tests on macOS 26 with Xcode 26, ad-hoc signed, and fails if any tracked file contains an em dash.
 - `CONTRIBUTING.md`, issue forms (bug report with macOS/Fader version, output device and a logs command; feature request), a pull request template with the checklist, and Dependabot for GitHub Actions. README shows the CI badge.
 
 **Website**
 
+- Chrome tab controls and the optional Automation permission are documented on the landing page and in the README, with an updated panel example.
 - The hero screenshot is now an interactive HTML copy of the panel: draggable sliders with the 100% detent, mute buttons, and live meters shaped per app (music, call, game, video). With reduced motion the meters hold steady levels that still follow volume and mute.
 - "Why" section compares a faithful Control Center (Sound module highlighted) with a compact Fader panel, instead of abstract sliders.
 - Features are a bento grid where each tile shows its feature: the 0-200% sweep, live meters, the device menu, keycaps, the idle CPU number, restored volumes, helper-to-app names and "0 network requests".

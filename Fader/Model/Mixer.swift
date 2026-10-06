@@ -26,6 +26,8 @@ final class Mixer: ObservableObject {
     static let maxVolume: Float = 2
     /// A `--snapshot` run is a second copy of the app: it must never tap audio.
     static let touchesAudio = Snapshot.requestedPath == nil
+        && ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil
+        && NSClassFromString("XCTestCase") == nil
 
     @Published private(set) var apps: [AppEntry] = []
     @Published private(set) var output = DeviceState(direction: .output)
@@ -34,6 +36,7 @@ final class Mixer: ObservableObject {
     @Published private(set) var launchAtLogin = SMAppService.mainApp.status == .enabled
     @Published private(set) var rememberVolumes: Bool
     @Published private(set) var dictationKeyOpensPanel: Bool
+    let chromeTabs = ChromeTabs()
 
     private let store = VolumeStore()
     private var taps: [String: AppTap] = [:]
@@ -50,8 +53,9 @@ final class Mixer: ObservableObject {
         rememberVolumes = store.remembers
         UserDefaults.standard.register(defaults: [Self.dictationKeyDefault: true])
         dictationKeyOpensPanel = UserDefaults.standard.bool(forKey: Self.dictationKeyDefault)
-        DictationKeyRemap.apply(dictationKeyOpensPanel)
+        if Self.touchesAudio { DictationKeyRemap.apply(dictationKeyOpensPanel) }
         refresh()
+        guard Self.touchesAudio else { return }
         observeCoreAudio()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.refresh() }
@@ -224,6 +228,7 @@ final class Mixer: ObservableObject {
         next.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         if next != apps { apps = next }
         updateMeterHub()
+        if Self.touchesAudio { chromeTabs.refresh(visible: isMetering) }
     }
 
     /// Device lists only change when hardware comes or goes (Core Audio tells us), so they're
@@ -321,7 +326,7 @@ final class Mixer: ObservableObject {
     }
 
     private func updateMicMeter() {
-        guard isMetering else { return }
+        guard isMetering, Self.touchesAudio else { return }
         micMeter.start(on: input.current, transport: input.currentDevice?.transport)
         levels.micAvailability = micMeter.availability
     }
@@ -377,6 +382,13 @@ final class Mixer: ObservableObject {
         meterHub.stop()
         for tap in taps.values { tap.invalidate() }
         taps.removeAll()
+    }
+
+    /// A deterministic UI fixture; snapshot runs never contact Chrome or touch live audio.
+    func loadChromeTabsPreview() {
+        guard !Self.touchesAudio else { return }
+        apps = [AppEntry(id: ChromeAutomation.bundleID, name: "Google Chrome", icon: NSWorkspace.shared.icon(forFile: "/Applications/Google Chrome.app"), processes: [], isPlaying: true, volume: 0.75, muted: false)]
+        chromeTabs.loadPreview()
     }
 }
 

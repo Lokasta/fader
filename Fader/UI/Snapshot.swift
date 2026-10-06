@@ -14,6 +14,7 @@ enum Snapshot {
     static func run(to path: String, mixer: Mixer) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             mixer.refresh()
+            if CommandLine.arguments.contains("--snapshot-chrome-tabs") { mixer.loadChromeTabsPreview() }
             let host = NSHostingView(rootView: MixerView().environmentObject(mixer).background(Color(nsColor: .windowBackgroundColor)))
             host.frame.size = host.fittingSize
             let window = NSWindow(contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)

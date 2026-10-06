@@ -22,9 +22,11 @@ You can't hear audio, so verify with these instead:
 - **Unit tests** cover the real-time renderer, volume store and meter math: `xcodebuild ... test`.
 - **Logs** (the shell's `log` is a zsh builtin, use the full path):
   `/usr/bin/log show --last 5m --predicate 'subsystem == "com.lokasta.fader"' --info`
-  Categories: `mixer` (tap decisions), `meters`, `panel`, `mic`, `keys`, `tap`.
+  Categories: `mixer` (tap decisions), `meters`, `panel`, `mic`, `keys`, `tap`, `chrome` (automation failures and response counts; no tab titles or URLs).
 - **Snapshot** the real panel to a PNG without touching audio (a `--snapshot` run never creates taps):
   `build/Build/Products/Debug/Fader.app/Contents/MacOS/Fader --snapshot out.png -AppleLanguages '(en)'`
+- **Chrome fixture:** add `--snapshot-chrome-tabs` for deterministic tab rows. Snapshot and XCTest hosts never automate the live browser, remap keys or open the microphone.
+- **Chrome player checks:** `node scripts/test-chrome-media.cjs` with Playwright installed, or `FADER_TEST_CHROME=1 node scripts/test-chrome-media.cjs` with an installed Chrome. These use an isolated, muted browser with offline fixtures; CI installs the pinned tools separately from the repo.
 - **Generate sound** to test with: `say "testing"` or `afplay /System/Library/Sounds/Submarine.aiff`. Both are attributed to the terminal app that launched them.
 - **CPU**: `ps -o time= -p $(pgrep -x Fader)` before and after 30 s. Idle with the panel closed should stay under ~1%.
 
@@ -42,6 +44,9 @@ You can't hear audio, so verify with these instead:
 | `Fader/Model/Mixer.swift` | `@MainActor` model: 1 s refresh + Core Audio listeners (bursts coalesced), `reconcileTap`, metering lifecycle, `DeviceState` for output and mic. |
 | `Fader/Model/LevelMeters.swift` | dB normalization and smoothing; separate `ObservableObject` so 30 Hz updates don't redraw the whole panel. |
 | `Fader/Model/VolumeStore.swift` | Per-bundle-ID volume and mute in UserDefaults. |
+| `Fader/Browser/ChromeAutomation.swift` | Opt-in Automation permission, tab metadata enumeration, bounded per-tab Apple Events and timeout backoff. Runs off the UI thread. |
+| `Fader/Browser/ChromeMedia.js` | Relative gain for HTML audio/video, original player settings, document identity and restoration watchdog. Bundled as a resource. |
+| `Fader/Model/ChromeTabs.swift` | Playing-tab discovery, pending controls, in-memory state and restore-on-disable/quit. |
 | `Fader/UI/` | SwiftUI views; `FloatingPanel` (Control Center-style panel), `GlobalHotKey` (⌃⌥V, F18), `DictationKeyRemap` (F5 to F18 via `hidutil`), `WindowVisibility`, `Snapshot`. |
 | `FaderControls/` | WidgetKit extension (macOS 26+): one `ControlWidgetButton` that opens `fader://panel`. |
 | `Config/Signing.xcconfig` | Ad-hoc signing by default; `Config/Local.xcconfig` (gitignored) overrides it. |
@@ -67,6 +72,7 @@ You can't hear audio, so verify with these instead:
 9. **`fader://` URLs** go through a raw Apple Event handler in `AppDelegate`; SwiftUI swallows them in menu bar-only apps.
 10. **No network access.** Fader makes no network requests and has no analytics. Keep it that way.
 11. **XcodeGen rewrites `.entitlements` files**: declare entitlements in `project.yml` (`entitlements.properties`), not by editing the file.
+12. **Chrome controls are optional and operate on compatible players, not Core Audio tabs.** Preserve the site's volume/mute baseline, keep Fader-muted playing tabs recoverable, never carry a control across navigation, and never let one unresponsive tab fail the entire list. Tab metadata and adjustments must stay in memory.
 
 ## Conventions
 

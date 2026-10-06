@@ -50,9 +50,34 @@ spctl --assess --type open --context context:primary-signature -v "$DMG"
 
 # A stable name too, so ".../releases/latest/download/LokastasFader.dmg" always points at the newest build.
 cp "$DMG" dist/LokastasFader.dmg
-echo "Ready: $DMG (+ dist/LokastasFader.dmg)"
+(
+    cd dist
+    shasum -a 256 "LokastasFader-$VERSION.dmg" LokastasFader.dmg > SHA256SUMS
+)
+echo "Ready: $DMG (+ dist/LokastasFader.dmg and SHA256SUMS)"
 
 if [[ "${PUBLISH:-0}" == 1 ]]; then
-    NOTES=$(awk -v v="$VERSION" '$0 ~ "^## .* -- "v"$" {f=1; next} /^## / && f {exit} f' CHANGELOG.md)
-    gh release create "v$VERSION" "$DMG" dist/LokastasFader.dmg --title "Lokasta's Fader $VERSION" --notes "$NOTES"
+    if [[ -n "$(git status --porcelain)" ]] || [[ "$(git rev-parse "v$VERSION^{commit}")" != "$(git rev-parse HEAD)" ]]; then
+        echo "Publish requires a clean checkout and v$VERSION tagged at HEAD. Commit and push the release tag first." >&2
+        exit 1
+    fi
+    NOTES="$STAGE/release-notes.md"
+    awk -v v="$VERSION" '$0 ~ "^## .* -- "v"$" {f=1; next} /^## / && f {exit} f' CHANGELOG.md > "$NOTES"
+    if [[ ! -s "$NOTES" ]]; then
+        echo "No changelog entry found for $VERSION." >&2
+        exit 1
+    fi
+    cat >> "$NOTES" <<'INSTALL'
+
+### Install
+
+Download **LokastasFader.dmg**, open it and drag Fader into Applications. Requires macOS 15+. Signed with Developer ID and notarized by Apple. To update, replace the existing app; your app volumes and preferences are kept.
+
+Chrome tab controls are optional: allow Fader to automate Chrome, enable **View > Developer > Allow JavaScript from Apple Events** in Chrome, then enable tab controls in Fader. Web Audio and unsupported players use Chrome's main slider.
+
+Checksums are available in **SHA256SUMS**.
+
+Full history: [CHANGELOG.md](https://github.com/Lokasta/fader/blob/main/CHANGELOG.md)
+INSTALL
+    gh release create "v$VERSION" "$DMG" dist/LokastasFader.dmg dist/SHA256SUMS --verify-tag --latest --title "Lokasta's Fader $VERSION" --notes-file "$NOTES"
 fi

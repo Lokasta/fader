@@ -30,6 +30,7 @@ Fader uses the **Core Audio Process Taps** Apple added in macOS 14.2. It only to
 - **Remembers** each app's volume and reapplies it the next time the app plays.
 - **Output and microphone switcher** with their system volume, right at the top.
 - **Real app names**: Chrome's audio service shows up as Chrome, Safari's WebKit process as Safari, macOS alerts as "System Sounds".
+- **Chrome tab controls**, without an extension: expand Chrome to adjust compatible playing audio/video tabs separately.
 - **Open it your way**: menu bar icon, a **Control Center control** (macOS 26), the **Dictation key (F5)**, **⌃⌥V** from anywhere, or Spotlight.
 - **Light**: ~0.5% CPU at idle. Meters run only while the panel is open.
 - **Private**: no network access at all. See [SECURITY.md](SECURITY.md).
@@ -80,6 +81,24 @@ pkill -x Fader; defaults write com.lokasta.fader "NSStatusItem Preferred Positio
 
 ## How it works
 
+### Chrome tabs
+
+<p align="center">
+  <img src="docs/chrome-tabs.png" width="340" alt="Example Fader panel with separate Chrome tab sliders and a muted tab">
+</p>
+
+Expand **Tabs with audio** under Google Chrome and choose **Enable tab controls** (also available in the gear menu). Allow Fader to control Chrome when macOS asks. In Chrome, enable **View > Developer > Allow JavaScript from Apple Events**, then choose **Try again** in Fader.
+
+Only compatible playing audio/video players appear, including same-origin frames and open shadow roots. Paused, ended, site-muted and video-only players are excluded. A tab muted or turned down to zero by Fader stays accessible while its player runs. The tab slider scales the site's existing player volume from 0 to 100%; Chrome's main 0-200% slider still controls the entire browser.
+
+This is player-level control through Apple Events, not independent Core Audio taps per tab. Web Audio, inaccessible cross-origin frames, protected players and other unsupported sources may not appear; use Chrome's main slider for those. Playback detection is based on player state and audio-track information, not a sample-level measurement of silence. No microphone is opened and no audio is captured for tab controls.
+
+Tab titles, URLs and settings stay in memory. Reset, disabling the feature and a normal Fader quit restore the player's previous settings. If Fader crashes, a watchdog restores them after contact is lost; Chrome may delay the timer for background tabs. Reloading or navigating to a new page resets that tab's controls.
+
+Unresponsive tabs are skipped temporarily and retried after 15 seconds, so a sleeping tab cannot make the entire list fail.
+
+### App audio
+
 For an app you turn down (or up):
 
 1. A **process tap** captures the app's processes and, with `mutedWhenTapped`, keeps them from reaching the speakers directly.
@@ -99,6 +118,8 @@ build/Build/Products/Debug/Fader.app/Contents/MacOS/Fader --snapshot panel.png  
 /usr/bin/log show --last 5m --predicate 'subsystem == "com.lokasta.fader"' --info  # logs
 ./scripts/release.sh                                                # signed + notarized DMG
 ```
+
+Chrome player integration checks also run in CI. With Node.js and Playwright available, run `node scripts/test-chrome-media.cjs` (or `FADER_TEST_CHROME=1 node scripts/test-chrome-media.cjs` to use an installed Chrome). Tests use offline pages in an isolated, muted browser.
 
 Contributions are welcome. Read [AGENTS.md](AGENTS.md) first (yes, humans too), keep the IO path real-time safe, and add a [CHANGELOG](CHANGELOG.md) entry.
 

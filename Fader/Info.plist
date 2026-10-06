@@ -35,6 +35,8 @@
 	<string>public.app-category.utilities</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Fader controls the volume of playing audio and video in Chrome tabs. Tab information stays on your Mac.</string>
 	<key>NSAudioCaptureUsageDescription</key>
 	<string>Fader needs access to each app's audio to control its volume individually. Nothing is recorded or leaves your Mac.</string>
 	<key>NSHumanReadableCopyright</key>

@@ -26,6 +26,8 @@ build/Build/Products/Debug/Fader.app/Contents/MacOS/Fader --snapshot panel.png  
 
 Changed `project.yml` or added a file? Run `xcodegen generate` again.
 
+For Chrome player changes, also run `node scripts/test-chrome-media.cjs` with Playwright installed, or `FADER_TEST_CHROME=1 node scripts/test-chrome-media.cjs` to use an installed Chrome. Fixtures are offline and the browser is isolated and muted. CI installs Playwright and Chromium in a temporary directory; no Node dependency files are needed in the repo. Use `--snapshot-chrome-tabs` with the snapshot command to inspect tab rows without touching a real browser.
+
 ## Verifying audio changes without hearing them
 
 Tests and CI can't listen, and neither can a coding agent. [AGENTS.md](AGENTS.md#how-to-verify-your-change) lists what to use instead: unit tests for the renderer and meter math, the `com.lokasta.fader` logs, `--snapshot`, `say`/`afplay` to generate sound, and a quick CPU check.
@@ -55,3 +57,5 @@ Imperative subject line ("Add mute shortcut", not "Added..."), and a short body 
 ## Releases
 
 Releases are cut by the maintainer with `scripts/release.sh`, which builds, signs with Developer ID, notarizes and publishes the DMG. Contributors don't need to bump versions or touch the release script.
+
+Before publishing, move the changelog entries into a dated version section, commit the release, run CI and push the matching version tag at that commit. `PUBLISH=1 ./scripts/release.sh` requires a clean checkout and the published tag; it uploads the versioned and stable DMGs, SHA-256 checksums and changelog notes. The stable asset keeps the README and website download links current.

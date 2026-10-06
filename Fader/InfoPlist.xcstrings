@@ -2,6 +2,16 @@
   "sourceLanguage": "en",
   "version": "1.0",
   "strings": {
+    "NSAppleEventsUsageDescription": {
+      "localizations": {
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Fader controla o volume de áudio e vídeo em reprodução nas abas do Chrome. As informações das abas ficam no seu Mac."
+          }
+        }
+      }
+    },
     "NSAudioCaptureUsageDescription": {
       "localizations": {
         "pt-BR": {
